@@ -7,4 +7,8 @@ public interface IValueEnum {
     default Integer getIntValue() {
         return Integer.parseInt(getValue());
     }
+
+    default boolean equalsValue(Object value) {
+        return value != null && getValue().equals(value.toString());
+    }
 }
