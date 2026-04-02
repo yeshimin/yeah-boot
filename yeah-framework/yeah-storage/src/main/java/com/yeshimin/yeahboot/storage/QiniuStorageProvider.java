@@ -158,7 +158,7 @@ public class QiniuStorageProvider implements StorageProvider {
      */
     private String getDownloadUrlByDefault(String key, String fileName, boolean isPublic) {
         String domain = isPublic ? qiniu.getPublicDomain() : qiniu.getDomain();
-        DownloadUrl url = new DownloadUrl(domain, false, key);
+        DownloadUrl url = new DownloadUrl(domain, qiniu.getUseHttps(), key);
         // 指定文件名
         if (StrUtil.isNotBlank(fileName)) {
             url.setAttname(fileName);

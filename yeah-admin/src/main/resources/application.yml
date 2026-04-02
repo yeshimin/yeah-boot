@@ -166,6 +166,7 @@ yeah-boot:
         secret-key: OVERWRITE_ME
         bucket: OVERWRITE_ME
         domain: OVERWRITE_ME
+        use-https: true
       # minio存储相关配置
       minio:
         enabled: false

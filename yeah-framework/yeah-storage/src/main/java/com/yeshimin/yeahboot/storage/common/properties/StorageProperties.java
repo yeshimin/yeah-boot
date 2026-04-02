@@ -83,6 +83,7 @@ public class StorageProperties {
         private String secretKey;
         private String bucket;
         private String domain;
+        private Boolean useHttps = false;
     }
 
     @Data
