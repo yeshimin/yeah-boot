@@ -146,6 +146,16 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
         return R.ok(sysUserService.queryUserResources(userId));
     }
 
+    /**
+     * 更新用户个人信息
+     */
+    @PostMapping("/updateMine")
+    public R<Void> updateMine(@Valid @RequestBody SysUserUpdateMineDto dto) {
+        Long userId = WebContextUtils.getUserId();
+        sysUserService.updateMine(userId, dto);
+        return R.ok();
+    }
+
     // ================================================================================
 
     /**

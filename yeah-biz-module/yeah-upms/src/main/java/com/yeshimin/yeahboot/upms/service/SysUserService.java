@@ -2,6 +2,7 @@ package com.yeshimin.yeahboot.upms.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -376,6 +377,68 @@ public class SysUserService {
         });
 
         return listAllVo.stream().filter(vo -> vo.getParentId() == 0).collect(Collectors.toList());
+    }
+
+    /**
+     * 更新用户个人信息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMine(Long userId, SysUserUpdateMineDto dto) {
+        // 检查：用户是否存在
+        SysUserEntity entity = sysUserRepo.findOneById(userId);
+        if (entity == null) {
+            throw new RuntimeException("用户未找到");
+        }
+
+        // 密码，需要校验原密码
+        if (StrUtil.isNotBlank(dto.getOldPassword()) && StrUtil.isNotBlank(dto.getNewPassword())) {
+            if (!passwordService.validatePassword(dto.getOldPassword(), entity.getPassword())) {
+                throw new BaseException("原密码错误");
+            }
+            entity.setPassword(passwordService.encodePassword(dto.getNewPassword()));
+        } else {
+            // 置空，跳过更新
+            entity.setPassword(null);
+        }
+
+        // 按需更新头像
+        if (StrUtil.isNotBlank(dto.getAvatar()) && !Objects.equals(dto.getAvatar(), entity.getAvatar())) {
+            storageManager.markUse(dto.getAvatar());
+            // 将旧的标记为未使用以待自动清理
+            storageManager.unmarkUse(entity.getAvatar());
+        } else {
+            // 置空，跳过更新
+            entity.setAvatar(null);
+        }
+
+        // 昵称
+        if (StrUtil.isNotBlank(dto.getNickname())) {
+            entity.setNickname(dto.getNickname());
+        }
+        // 手机号，确认校验格式，并且确保唯一
+        if (StrUtil.isNotBlank(dto.getMobile()) && !Objects.equals(dto.getMobile(), entity.getMobile())) {
+            if (!Validator.isMobile(dto.getMobile())) {
+                throw new BaseException("手机号格式不正确");
+            }
+            if (!Objects.equals(entity.getMobile(), dto.getMobile())
+                    && sysUserRepo.countByMobile(dto.getMobile()) > 0) {
+                throw new BaseException("手机号已存在");
+            }
+            entity.setMobile(dto.getMobile());
+        }
+        // 邮箱，确认校验格式
+        if (StrUtil.isNotBlank(dto.getEmail()) && !Objects.equals(dto.getEmail(), entity.getEmail())) {
+            if (!Validator.isEmail(dto.getEmail())) {
+                throw new BaseException("邮箱格式不正确");
+            }
+            entity.setEmail(dto.getEmail());
+        }
+        // 性别
+        if (StrUtil.isNotBlank(dto.getGender())) {
+            entity.setGender(dto.getGender());
+        }
+
+        entity.updateById();
     }
 
     // ================================================================================

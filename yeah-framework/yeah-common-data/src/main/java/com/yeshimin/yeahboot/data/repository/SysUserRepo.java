@@ -58,4 +58,24 @@ public class SysUserRepo extends BaseRepo<SysUserMapper, SysUserEntity> {
     public IPage<SysUserEntity> query(Page<SysUserEntity> page, SysUserQueryDto dto) {
         return sysUserMapper.query(page, dto);
     }
+
+    /**
+     * countByMobile
+     */
+    public long countByMobile(String mobile) {
+        if (StrUtil.isBlank(mobile)) {
+            throw new IllegalArgumentException("mobile不能为空");
+        }
+        return this.lambdaQuery().eq(SysUserEntity::getMobile, mobile).count();
+    }
+
+    /**
+     * countByEmail
+     */
+    public long countByEmail(String email) {
+        if (StrUtil.isBlank(email)) {
+            throw new IllegalArgumentException("email不能为空");
+        }
+        return this.lambdaQuery().eq(SysUserEntity::getEmail, email).count();
+    }
 }
