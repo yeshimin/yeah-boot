@@ -116,7 +116,7 @@ auth:
 
 yeah-boot:
   # 是否开启验证码校验
-  captcha-enabled: false
+  captcha-enabled: true
   # 是否为安全模式（场景：跳过@PreAuthorize @pms.hasPermission权限校验，方便权限配置或其他场景；一般为false，不需要动）
   safe-mode: false
   sms-code-length: 6
