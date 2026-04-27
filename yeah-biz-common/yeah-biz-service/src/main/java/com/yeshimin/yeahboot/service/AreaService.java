@@ -1,5 +1,6 @@
 package com.yeshimin.yeahboot.service;
 
+import com.yeshimin.yeahboot.common.domain.base.BaseEntity;
 import com.yeshimin.yeahboot.data.domain.entity.*;
 import com.yeshimin.yeahboot.data.domain.vo.AreaVo;
 import com.yeshimin.yeahboot.data.repository.*;
@@ -36,10 +37,11 @@ public class AreaService {
     public List<AreaVo> queryCity(String provinceCode) {
         return areaCityRepo.lambdaQuery()
                 .eq(AreaCityEntity::getParentCode, provinceCode)
-                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode, AreaCityEntity::getName)
+                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode, AreaCityEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setParentCode(e.getParentCode());
                     vo.setCode(e.getCode());
                     vo.setName(e.getName());
@@ -54,10 +56,11 @@ public class AreaService {
     public List<AreaVo> queryDistrict(String cityCode) {
         return areaDistrictRepo.lambdaQuery()
                 .eq(AreaDistrictEntity::getParentCode, cityCode)
-                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode, AreaDistrictEntity::getName)
+                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode, AreaDistrictEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setParentCode(e.getParentCode());
                     vo.setCode(e.getCode());
                     vo.setName(e.getName());
@@ -160,11 +163,12 @@ public class AreaService {
         if (list != null) {
             return list;
         }
-        return areaVillageRepo.lambdaQuery().select(
-                        AreaVillageEntity::getParentCode, AreaVillageEntity::getCode, AreaVillageEntity::getName)
+        return areaVillageRepo.lambdaQuery()
+                .select(AreaVillageEntity::getParentCode, AreaVillageEntity::getCode, AreaVillageEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setParentCode(e.getParentCode());
                     vo.setCode(e.getCode());
                     vo.setName(e.getName());
@@ -177,11 +181,12 @@ public class AreaService {
         if (list != null) {
             return list;
         }
-        return areaStreetRepo.lambdaQuery().select(
-                        AreaStreetEntity::getParentCode, AreaStreetEntity::getCode, AreaStreetEntity::getName)
+        return areaStreetRepo.lambdaQuery()
+                .select(AreaStreetEntity::getParentCode, AreaStreetEntity::getCode, AreaStreetEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setParentCode(e.getParentCode());
                     vo.setCode(e.getCode());
                     vo.setName(e.getName());
@@ -194,11 +199,12 @@ public class AreaService {
         if (list != null) {
             return list;
         }
-        return areaCityRepo.lambdaQuery().select(
-                        AreaCityEntity::getParentCode, AreaCityEntity::getCode, AreaCityEntity::getName)
+        return areaCityRepo.lambdaQuery()
+                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode, AreaCityEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setParentCode(e.getParentCode());
                     vo.setCode(e.getCode());
                     vo.setName(e.getName());
@@ -211,11 +217,12 @@ public class AreaService {
         if (list != null) {
             return list;
         }
-        return areaDistrictRepo.lambdaQuery().select(
-                        AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode, AreaDistrictEntity::getName)
+        return areaDistrictRepo.lambdaQuery()
+                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode, AreaDistrictEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setParentCode(e.getParentCode());
                     vo.setCode(e.getCode());
                     vo.setName(e.getName());
@@ -228,11 +235,12 @@ public class AreaService {
         if (list != null) {
             return list;
         }
-        return areaProvinceRepo.lambdaQuery().select(
-                        AreaProvinceEntity::getCode, AreaProvinceEntity::getName)
+        return areaProvinceRepo.lambdaQuery()
+                .select(AreaProvinceEntity::getCode, AreaProvinceEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
+                    vo.setId(e.getId());
                     vo.setCode(e.getCode());
                     vo.setParentCode("");
                     vo.setName(e.getName());

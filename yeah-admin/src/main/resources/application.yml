@@ -74,7 +74,7 @@ auth:
       default-leeway: 60
     subjects:
       - name: admin
-        api-prefix: '/admin,/basic,/auth,/ws'
+        api-prefix: '/admin,/basic,/auth,/ws,/area'
         jwt:
           # 签发密钥
           secret: wee8Deonee4egh5taif8noim8pee1aiJ

@@ -11,6 +11,11 @@ import java.util.List;
 public class AreaVo extends BaseDomain {
 
     /**
+     * ID
+     */
+    private Long id;
+
+    /**
      * 父编码
      */
     private String parentCode;
