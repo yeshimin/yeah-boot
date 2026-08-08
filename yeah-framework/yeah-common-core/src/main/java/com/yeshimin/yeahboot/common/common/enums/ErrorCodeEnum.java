@@ -11,6 +11,7 @@ public enum ErrorCodeEnum {
     SUCCESS(0, "成功"),
     FAIL(1, "失败"),
     AUTH_REQUIRED(401, "未认证"),
+    FORBIDDEN(403, "权限不足"),
     ;
 
     private final Integer code;
