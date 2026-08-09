@@ -75,13 +75,23 @@ public class SysStorageRepo extends BaseRepo<SysStorageMapper, SysStorageEntity>
         }
 
         // 先去重
-        Set<String> fileKeySet = new HashSet<>(Arrays.asList(fileKey));
+        Set<String> fileKeySet = new HashSet<>(Arrays.asList(fileKeys));
 
         List<SysStorageEntity> list = this.findListByFileKeys(fileKeySet);
 
-        if (list.size() != fileKeySet.size()) {
-            throw new BaseException(ErrorCodeEnum.FAIL, "部分存储记录未找到");
+        // 标记为使用，严格校验
+        if (isUsed) {
+            if (list.size() != fileKeySet.size()) {
+                throw new BaseException(ErrorCodeEnum.FAIL, "部分存储记录未找到");
+            }
         }
+        // 标记取消使用，考虑到比如手动删除了记录等情况，为保证不报错，所以不做校验
+        else {
+            if (list.isEmpty()) {
+                return;
+            }
+        }
+
 
         List<Long> ids = list.stream().map(SysStorageEntity::getId).collect(Collectors.toList());
 
