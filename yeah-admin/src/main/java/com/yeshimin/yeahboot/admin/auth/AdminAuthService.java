@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.yeshimin.yeahboot.auth.service.TerminalAndTokenControlService;
 import com.yeshimin.yeahboot.common.common.enums.AuthSubjectEnum;
 import com.yeshimin.yeahboot.common.common.enums.AuthTerminalEnum;
+import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.common.service.PasswordService;
@@ -73,6 +74,9 @@ public class AdminAuthService {
 
             // 校验密码
             boolean success = passwordService.validatePassword(authenticateDto.getPassword(), sysUser.getPassword());
+            if (success && !DataStatusEnum.ENABLED.equalsValue(sysUser.getStatus())) {
+                throw new BaseException("用户已禁用");
+            }
             vo.setSuccess(success);
         }
         return vo;

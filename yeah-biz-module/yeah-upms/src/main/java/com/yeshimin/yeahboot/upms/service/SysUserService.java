@@ -6,6 +6,9 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yeshimin.yeahboot.auth.service.TokenService;
+import com.yeshimin.yeahboot.common.common.enums.AuthSubjectEnum;
+import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.common.domain.base.IdNameVo;
 import com.yeshimin.yeahboot.common.service.PasswordService;
@@ -42,6 +45,7 @@ public class SysUserService {
     private final SysUserPostRepo sysUserPostRepo;
 
     private final PasswordService passwordService;
+    private final TokenService tokenService;
 
     private final StorageManager storageManager;
 
@@ -248,6 +252,7 @@ public class SysUserService {
 
         // 获取旧值
         String oldAvatar = entity.getAvatar();
+        String oldStatus = entity.getStatus();
 
         // 更新用户信息
         BeanUtil.copyProperties(dto, entity);
@@ -271,6 +276,11 @@ public class SysUserService {
         }
 
         entity.updateById();
+
+        // “禁用”逻辑；仅当“启用”变为“禁用”时命中
+        if (DataStatusEnum.ENABLED.equalsValue(oldStatus) && DataStatusEnum.DISABLED.equalsValue(dto.getStatus())) {
+            tokenService.deleteUserTokens(AuthSubjectEnum.ADMIN.getValue(), String.valueOf(entity.getId()));
+        }
         return entity;
     }
 

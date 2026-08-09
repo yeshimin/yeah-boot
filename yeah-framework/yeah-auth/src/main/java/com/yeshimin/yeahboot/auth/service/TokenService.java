@@ -67,6 +67,26 @@ public class TokenService {
     }
 
     /**
+     * 删除指定用户在指定主体下的所有token
+     */
+    public void deleteUserTokens(String subject, String userId) {
+        // 获取指定subject的信息
+        Map<String, String> subjectTerminalInfo = this.getSubjectTerminalInfo(subject, userId);
+        // 遍历subject下的terminal
+        subjectTerminalInfo.keySet().forEach(terminal -> {
+            // 获取terminal信息
+            Map<String, String> terminalTokenInfo = this.getTerminalTokenInfo(subject, userId, terminal);
+            // 删除terminal下的所有token
+            terminalTokenInfo.keySet()
+                    .forEach(iatMs -> this.deleteToken(subject, userId, terminal, Long.valueOf(iatMs)));
+            // 删除terminal信息
+            cacheService.delete(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subject, userId, terminal));
+        });
+        // 删除subject信息
+        cacheService.delete(String.format(CacheKeyConsts.USER_SUBJECT_TERMINAL_INFO, subject, userId));
+    }
+
+    /**
      * 获取sub下用户所有终端信息
      * hash类型
      */

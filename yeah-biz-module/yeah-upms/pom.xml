@@ -17,6 +17,11 @@
             <groupId>com.yeshimin.yeahboot</groupId>
             <artifactId>yeah-common-core</artifactId>
         </dependency>
+        <!-- auth module -->
+        <dependency>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-auth</artifactId>
+        </dependency>
         <!-- common data module -->
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>
