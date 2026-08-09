@@ -412,13 +412,22 @@ public class SysUserService {
         }
 
         // 按需更新头像
-        if (StrUtil.isNotBlank(dto.getAvatar()) && !Objects.equals(dto.getAvatar(), entity.getAvatar())) {
-            storageManager.markUse(dto.getAvatar());
-            // 将旧的标记为未使用以待自动清理
-            storageManager.unmarkUse(entity.getAvatar());
-        } else {
-            // 置空，跳过更新
-            entity.setAvatar(null);
+        if (dto.getAvatar() != null) {
+            // 置空
+            if (StrUtil.isBlank(dto.getAvatar())) {
+                if (StrUtil.isNotBlank(entity.getAvatar())) {
+                    storageManager.unmarkUse(entity.getAvatar());
+                }
+                entity.setAvatar("");
+            }
+            // 更新
+            else {
+                // 将旧的标记为未使用以待自动清理
+                storageManager.unmarkUse(entity.getAvatar());
+
+                entity.setAvatar(dto.getAvatar());
+                storageManager.markUse(dto.getAvatar());
+            }
         }
 
         // 昵称
