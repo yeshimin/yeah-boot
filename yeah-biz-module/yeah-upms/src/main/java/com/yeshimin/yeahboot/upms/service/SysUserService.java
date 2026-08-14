@@ -10,6 +10,7 @@ import com.yeshimin.yeahboot.auth.service.TokenService;
 import com.yeshimin.yeahboot.common.common.enums.AuthSubjectEnum;
 import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
+import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
 import com.yeshimin.yeahboot.common.domain.base.IdNameVo;
 import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
@@ -48,6 +49,7 @@ public class SysUserService {
     private final TokenService tokenService;
 
     private final StorageManager storageManager;
+    private final YeahBootProperties yeahBootProperties;
 
     /**
      * 创建
@@ -357,11 +359,15 @@ public class SysUserService {
      * 查询用户资源
      */
     public List<SysUserResTreeNodeVo> queryUserResources(Long userId) {
+        SysUserEntity user = sysUserRepo.getOneById(userId);
+        boolean permissionBypassed = this.isPermissionBypassed(user);
+
         // 1.查询用户对应的勾选的资源
         List<Long> roleIds = sysUserRoleRepo.findListByUserId(userId)
                 .stream().map(SysUserRoleEntity::getRoleId).collect(Collectors.toList());
-        Set<Long> checkedSet = sysRoleResRepo.findListByRoleIds(roleIds)
-                .stream().map(SysRoleResEntity::getResId).collect(Collectors.toSet());
+        Set<Long> checkedSet = permissionBypassed ? Collections.emptySet() :
+                sysRoleResRepo.findListByRoleIds(roleIds)
+                        .stream().map(SysRoleResEntity::getResId).collect(Collectors.toSet());
 
         // 2.查询资源树
         List<SysUserResTreeNodeVo> listAllVo = sysResRepo.list()
@@ -378,7 +384,7 @@ public class SysUserService {
 
         listAllVo.forEach(vo -> {
             // set checked
-            vo.setChecked(checkedSet.contains(vo.getId()));
+            vo.setChecked(permissionBypassed || checkedSet.contains(vo.getId()));
 
             SysUserResTreeNodeVo parent = mapAll.get(vo.getParentId());
             if (parent != null) {
@@ -555,7 +561,17 @@ public class SysUserService {
                 .stream().map(SysUserOrgEntity::getOrgId).collect(Collectors.toList());
         List<SysOrgEntity> orgs = sysOrgRepo.findListByIds(orgIds);
 
-        List<String> permissions = Collections.singletonList("*:*:*");
+        List<String> permissions;
+        // 判断是否跳过权限校验，即返回“所有权限”
+        if (this.isPermissionBypassed(user)) {
+            permissions = Collections.singletonList("*:*:*");
+        } else {
+            List<Long> resIds = sysRoleResRepo.findListByRoleIds(roleIds)
+                    .stream().map(SysRoleResEntity::getResId).distinct().collect(Collectors.toList());
+            permissions = resIds.isEmpty() ? Collections.emptyList() :
+                    sysResRepo.findListByIds(resIds).stream()
+                            .map(SysResEntity::getPermission).filter(StrUtil::isNotBlank).collect(Collectors.toList());
+        }
 
         MineVo vo = new MineVo();
         vo.setUser(user);
@@ -563,6 +579,20 @@ public class SysUserService {
         vo.setOrgs(orgs);
         vo.setPermissions(permissions);
         return vo;
+    }
+
+    private boolean isPermissionBypassed(SysUserEntity user) {
+        if (Objects.equals(Boolean.TRUE, yeahBootProperties.getSafeMode())) {
+            return true;
+        }
+        return this.isSuperAdmin(user);
+    }
+
+    private boolean isSuperAdmin(SysUserEntity user) {
+        if (user == null || StrUtil.isBlank(yeahBootProperties.getSuperAdmin())) {
+            return false;
+        }
+        return Objects.equals(yeahBootProperties.getSuperAdmin(), user.getUsername());
     }
 
     // ================================================================================
