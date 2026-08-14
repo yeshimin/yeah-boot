@@ -12,6 +12,7 @@ import com.yeshimin.yeahboot.data.mapper.SysResMapper;
 import com.yeshimin.yeahboot.data.repository.SysResRepo;
 import com.yeshimin.yeahboot.upms.service.SysResService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -38,6 +39,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     /**
      * 创建
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
     @PostMapping("/create")
     public R<SysResEntity> create(@Valid @RequestBody SysResCreateDto dto) {
         return R.ok(sysResService.create(dto));
@@ -46,6 +48,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     /**
      * 查询树
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':tree')")
     @GetMapping("/tree")
     public R<List<SysResTreeNodeVo>> tree(SysResTreeQueryDto dto) {
         return R.ok(sysResService.tree(dto));
@@ -54,6 +57,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     /**
      * 更新
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @PostMapping("/update")
     public R<SysResEntity> update(@Valid @RequestBody SysResUpdateDto dto) {
         return R.ok(sysResService.update(dto));
@@ -62,6 +66,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     /**
      * 删除
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto ids) {
         sysResService.delete(ids.getIds());

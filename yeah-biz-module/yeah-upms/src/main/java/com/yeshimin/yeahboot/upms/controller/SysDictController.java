@@ -11,6 +11,7 @@ import com.yeshimin.yeahboot.data.mapper.SysDictMapper;
 import com.yeshimin.yeahboot.data.repository.SysDictRepo;
 import com.yeshimin.yeahboot.upms.service.SysDictService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,6 +38,7 @@ public class SysDictController extends CrudController<SysDictMapper, SysDictEnti
     /**
      * 创建
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
     @PostMapping("/create")
     public R<SysDictEntity> create(@Valid @RequestBody SysDictCreateDto dto) {
         return R.ok(sysDictService.create(dto));
@@ -45,6 +47,7 @@ public class SysDictController extends CrudController<SysDictMapper, SysDictEnti
     /**
      * 查询树
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':tree')")
     @GetMapping("/tree")
     public R<List<SysDictTreeNodeVo>> tree(
             @RequestParam(value = "rootNodeCode", required = false) String rootNodeCode) {
@@ -54,6 +57,7 @@ public class SysDictController extends CrudController<SysDictMapper, SysDictEnti
     /**
      * 更新
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @PostMapping("/update")
     public R<SysDictEntity> update(@Valid @RequestBody SysDictUpdateDto dto) {
         return R.ok(sysDictService.update(dto));
@@ -62,6 +66,7 @@ public class SysDictController extends CrudController<SysDictMapper, SysDictEnti
     /**
      * 删除
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody SysDictDeleteDto dto) {
         sysDictService.delete(dto.getIds(), dto.getForce());

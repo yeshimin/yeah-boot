@@ -5,6 +5,7 @@ import com.yeshimin.yeahboot.service.AreaService;
 import com.yeshimin.yeahboot.common.controller.base.BaseController;
 import com.yeshimin.yeahboot.common.domain.base.R;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,7 @@ public class AreaController extends BaseController {
     /**
      * tree
      */
+    @PreAuthorize("@pms.hasPermission('admin:area:tree')")
     @GetMapping("/tree")
     public R<List<AreaVo>> tree(
             @RequestParam(value = "maxLevel", required = false, defaultValue = "3") Integer maxLevel) {

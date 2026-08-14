@@ -1,5 +1,6 @@
 package com.yeshimin.yeahboot.admin.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
 import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,18 @@ public class PermissionService {
         if (Objects.equals(Boolean.TRUE, yeahBootProperties.getSafeMode())) {
             return true;
         }
+        // 如果当前账号为超级管理员，则不做权限校验，即都返回true
+        if (this.isSuperAdmin()) {
+            return true;
+        }
         return Arrays.stream(permissions).anyMatch(permission -> WebContextUtils.getResources().contains(permission));
+    }
+
+    private boolean isSuperAdmin() {
+        if (StrUtil.isBlank(yeahBootProperties.getSuperAdmin())) {
+            return false;
+        }
+        String username = WebContextUtils.getUsername();
+        return Objects.equals(yeahBootProperties.getSuperAdmin(), username);
     }
 }

@@ -13,6 +13,7 @@ import com.yeshimin.yeahboot.data.mapper.SysRoleMapper;
 import com.yeshimin.yeahboot.data.repository.SysRoleRepo;
 import com.yeshimin.yeahboot.upms.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,6 +40,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     /**
      * 创建
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
     @PostMapping("/create")
     public R<SysRoleEntity> create(@Valid @RequestBody SysRoleCreateDto dto) {
         return R.ok(sysRoleService.create(dto));
@@ -47,6 +49,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     /**
      * 详情
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':detail')")
     @GetMapping("/detail")
     public R<SysRoleVo> detail(@RequestParam Long id) {
         return R.ok(sysRoleService.detail(id));
@@ -55,6 +58,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     /**
      * 更新
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @PostMapping("/update")
     public R<SysRoleEntity> update(@Valid @RequestBody SysRoleUpdateDto dto) {
         return R.ok(sysRoleService.update(dto));
@@ -63,6 +67,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     /**
      * 删除
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         sysRoleService.delete(dto.getIds());
@@ -74,6 +79,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     /**
      * 查询指定角色对应的资源数据
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':queryResourceTree')")
     @GetMapping("/queryResourceTree")
     public R<List<SysRoleResTreeNodeVo>> queryResourceTree(@RequestParam Long roleId) {
         return R.ok(sysRoleService.queryResourceTree(roleId));
@@ -82,6 +88,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     /**
      * 角色挂载资源（全量操作）
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':setResources')")
     @PostMapping("/setResources")
     public R<Boolean> setResources(@Valid @RequestBody SysRoleResSetDto dto) {
         return R.ok(sysRoleService.setResources(dto));

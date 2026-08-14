@@ -19,6 +19,7 @@ import com.yeshimin.yeahboot.upms.domain.vo.SysUserResTreeNodeVo;
 import com.yeshimin.yeahboot.upms.domain.vo.SysUserVo;
 import com.yeshimin.yeahboot.upms.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 创建
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
     @PostMapping("/create")
     public R<SysUserEntity> create(@Valid @RequestBody SysUserCreateDto dto) {
         return R.ok(sysUserService.create(dto));
@@ -53,6 +55,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 查询
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':query')")
     @GetMapping("/query")
     public R<IPage<SysUserVo>> query(Page<SysUserEntity> page, SysUserQueryDto dto) {
         return R.ok(sysUserService.query(page, dto));
@@ -61,6 +64,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 详情
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':detail')")
     @GetMapping("/detail")
     public R<SysUserVo> detail(@RequestParam Long id) {
         return R.ok(sysUserService.detail(id));
@@ -69,6 +73,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 更新
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @PostMapping("/update")
     public R<SysUserEntity> update(@Valid @RequestBody SysUserUpdateDto dto) {
         return R.ok(sysUserService.update(dto));
@@ -77,6 +82,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 删除
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         Long userId = WebContextUtils.getUserId();
@@ -89,6 +95,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 查询用户角色
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':queryUserRoles')")
     @GetMapping("/queryUserRoles")
     public R<List<SysRoleEntity>> queryUserRoles(@RequestParam Long userId) {
         return R.ok(sysUserService.queryUserRoles(userId));
@@ -97,6 +104,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 用户挂载角色（全部量操作）
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':setUserRoles')")
     @PostMapping("/setUserRoles")
     public R<Boolean> setUserRoles(@Valid @RequestBody UserRoleSetDto dto) {
         return R.ok(sysUserService.setUserRoles(dto));
@@ -105,6 +113,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 查询用户资源
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':queryUserResources')")
     @GetMapping("/queryUserResources")
     public R<List<SysUserResTreeNodeVo>> queryUserResources(@RequestParam Long userId) {
         return R.ok(sysUserService.queryUserResources(userId));
@@ -115,6 +124,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 查询用户组织
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':queryUserOrgs')")
     @GetMapping("/queryUserOrgs")
     public R<List<SysOrgEntity>> queryUserOrgs(@RequestParam Long userId) {
         return R.ok(sysUserService.queryUserOrgs(userId));
@@ -123,6 +133,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 用户挂载组织（全部量操作）
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':setUserOrgs')")
     @PostMapping("/setUserOrgs")
     public R<Boolean> setUserOrgs(@Valid @RequestBody UserOrgSetDto dto) {
         return R.ok(sysUserService.setUserOrgs(dto));
@@ -161,6 +172,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 查询用户岗位
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':queryUserPosts')")
     @GetMapping("/queryUserPosts")
     public R<List<SysPostEntity>> queryUserPosts(@RequestParam Long userId) {
         return R.ok(sysUserService.queryUserPosts(userId));
@@ -169,6 +181,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 用户挂载岗位（全部量操作）
      */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':setUserPosts')")
     @PostMapping("/setUserPosts")
     public R<Boolean> setUserPosts(@Valid @RequestBody UserPostSetDto dto) {
         return R.ok(sysUserService.setUserPosts(dto));
