@@ -119,6 +119,8 @@ yeah-boot:
   captcha-enabled: true
   # 是否为安全模式（场景：跳过@PreAuthorize @pms.hasPermission权限校验，方便权限配置或其他场景；一般为false，不需要动）
   safe-mode: false
+  # 超级管理员账号，该账号可以跳过权限校验
+  super-admin: admin
   sms-code-length: 6
   # 短信验证码过期时间（秒）
   sms-code-exp-seconds: 300
