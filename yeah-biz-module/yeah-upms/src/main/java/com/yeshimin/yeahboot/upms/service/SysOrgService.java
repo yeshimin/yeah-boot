@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,10 +104,18 @@ public class SysOrgService {
             if (parent == null) {
                 throw new BaseException("父节点未找到");
             }
+            // 检查：不能挂载到子节点
+            if (isParentInOwnSubTree(dto.getParentId(), dto.getId())) {
+                throw new BaseException("不能挂载到子节点");
+            }
         }
         // 检查：同一个父节点下是否存在相同名称
-        if (StrUtil.isNotBlank(dto.getName()) && !Objects.equals(dto.getName(), entity.getName())) {
-            if (sysOrgRepo.countByParentIdAndName(dto.getParentId(), dto.getName()) > 0) {
+        Long parentId = dto.getParentId() != null ? dto.getParentId() : entity.getParentId();
+        String name = StrUtil.isNotBlank(dto.getName()) ? dto.getName() : entity.getName();
+        boolean parentChanged = dto.getParentId() != null && !Objects.equals(dto.getParentId(), entity.getParentId());
+        boolean nameChanged = StrUtil.isNotBlank(dto.getName()) && !Objects.equals(dto.getName(), entity.getName());
+        if (parentChanged || nameChanged) {
+            if (sysOrgRepo.countByParentIdAndName(parentId, name) > 0) {
                 throw new BaseException("同一个父节点下已存在相同名称");
             }
         }
@@ -133,5 +143,30 @@ public class SysOrgService {
             }
             entity.deleteById();
         }
+    }
+
+    /**
+     * 判断目标父节点是否在当前节点自己的子树里
+     */
+    private boolean isParentInOwnSubTree(Long parentId, Long selfId) {
+        Long currentId = parentId;
+        Set<Long> visitedIds = new HashSet<>();
+
+        while (currentId != null && currentId > 0) {
+            if (Objects.equals(currentId, selfId)) {
+                return true;
+            }
+            if (!visitedIds.add(currentId)) {
+                throw new BaseException("组织父级关系存在循环");
+            }
+
+            SysOrgEntity current = sysOrgRepo.findOneById(currentId);
+            if (current == null) {
+                return false;
+            }
+            currentId = current.getParentId();
+        }
+
+        return false;
     }
 }
