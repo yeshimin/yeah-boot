@@ -135,7 +135,7 @@ public class SysUserService {
                     return null;
                 }
                 return new IdNameVo(sysPost.getId(), sysPost.getName());
-            }).collect(Collectors.toList()));
+            }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
             // 组织
             List<SysUserOrgEntity> userOrgs = mapUserOrgs.getOrDefault(e.getId(), Collections.emptyList());
@@ -145,7 +145,7 @@ public class SysUserService {
                     return null;
                 }
                 return new IdNameVo(sysOrg.getId(), sysOrg.getName());
-            }).collect(Collectors.toList()));
+            }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
             // 角色
             List<SysUserRoleEntity> userRoles = mapUserRoles.getOrDefault(e.getId(), Collections.emptyList());
@@ -155,7 +155,7 @@ public class SysUserService {
                     return null;
                 }
                 return new IdNameVo(sysRole.getId(), sysRole.getName());
-            }).filter(Objects::nonNull).collect(Collectors.toList()));
+            }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
             return vo;
         });
     }
@@ -194,7 +194,7 @@ public class SysUserService {
                 return null;
             }
             return new IdNameVo(sysPost.getId(), sysPost.getName());
-        }).collect(Collectors.toList()));
+        }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
         // 组织
         vo.setOrgs(listUserOrg.stream().map(r -> {
@@ -203,7 +203,7 @@ public class SysUserService {
                 return null;
             }
             return new IdNameVo(sysOrg.getId(), sysOrg.getName());
-        }).collect(Collectors.toList()));
+        }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
         // 角色
         vo.setRoles(listUserRole.stream().map(r -> {
@@ -212,7 +212,7 @@ public class SysUserService {
                 return null;
             }
             return new IdNameVo(sysRole.getId(), sysRole.getName());
-        }).filter(Objects::nonNull).collect(Collectors.toList()));
+        }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         return vo;
     }
 
@@ -291,21 +291,50 @@ public class SysUserService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long userId, List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+
+        if (ids.stream().anyMatch(id -> Objects.equals(userId, id))) {
+            throw new BaseException("不能删除自己");
+        }
+
+        List<SysUserEntity> users = new ArrayList<>();
         for (Long id : ids) {
-            // 检查：不能删除自己
-            if (Objects.equals(userId, id)) {
-                throw new BaseException("不能删除自己");
-            }
             // 检查：是否存在
             SysUserEntity entity = sysUserRepo.findOneById(id);
             if (entity == null) {
-                throw new RuntimeException(String.format("用户[%s]未找到", id));
+                throw new BaseException(String.format("用户[%s]未找到", id));
             }
+            if (this.isSuperAdmin(entity)) {
+                throw new BaseException("不能删除超级管理员");
+            }
+            users.add(entity);
+        }
+
+        for (SysUserEntity entity : users) {
+            Long id = entity.getId();
             entity.deleteById();
 
             // 删除user-role关联
             boolean result = sysUserRoleRepo.deleteByUserId(id);
             log.debug("deleteByUserId.id[{}]result: {}", id, result);
+
+            // 删除user-org关联
+            result = sysUserOrgRepo.deleteByUserId(id);
+            log.debug("deleteUserOrgByUserId.id[{}]result: {}", id, result);
+
+            // 删除user-post关联
+            result = sysUserPostRepo.deleteByUserId(id);
+            log.debug("deleteUserPostByUserId.id[{}]result: {}", id, result);
+
+            // 删除后台登录token
+            tokenService.deleteUserTokens(AuthSubjectEnum.ADMIN.getValue(), String.valueOf(id));
+
+            // 将头像标记为未使用以待自动清理
+            if (StrUtil.isNotBlank(entity.getAvatar())) {
+                storageManager.unmarkUse(entity.getAvatar());
+            }
         }
     }
 
