@@ -1,6 +1,8 @@
 package com.yeshimin.yeahboot.basic.service.storage;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson2.JSON;
+import com.yeshimin.yeahboot.basic.domain.dto.FileDeleteDto;
 import com.yeshimin.yeahboot.basic.domain.vo.FileUploadVo;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
@@ -17,6 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -64,5 +69,24 @@ public class StorageService extends BaseService {
     public void delete(String fileKey) {
         // 删除存储
         storageManager.delete(fileKey);
+    }
+
+    /**
+     * 批量删除文件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(FileDeleteDto dto) {
+        if (CollectionUtil.isNotEmpty(dto.getIds())) {
+            Set<String> fileKeys = sysStorageRepo.findListByIds(dto.getIds())
+                    .stream().map(SysStorageEntity::getFileKey).collect(Collectors.toSet());
+            if (CollectionUtil.isNotEmpty(fileKeys)) {
+                fileKeys.forEach(this::delete);
+            }
+            return;
+        }
+
+        if (CollectionUtil.isNotEmpty(dto.getFileKeys())) {
+            dto.getFileKeys().forEach(this::delete);
+        }
     }
 }

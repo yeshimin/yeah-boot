@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.basic.controller;
 
 import com.yeshimin.yeahboot.basic.domain.vo.FileUploadVo;
+import com.yeshimin.yeahboot.basic.domain.dto.FileDeleteDto;
 import com.yeshimin.yeahboot.basic.service.storage.StorageService;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 /**
  * 存储管理 - 提供存储能力
@@ -82,8 +85,8 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @PostMapping("/delete")
-    public R<Void> delete(@RequestParam("fileKey") String fileKey) {
-        storageService.delete(fileKey);
+    public R<Void> delete(@Valid @RequestBody FileDeleteDto dto) {
+        storageService.delete(dto);
         return R.ok();
     }
 }
