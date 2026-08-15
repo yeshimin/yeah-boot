@@ -58,7 +58,7 @@ public class FileService extends BaseService {
 
         // 添加文件记录
         SysFileEntity sysFile = new SysFileEntity();
-        sysFile.setStorageType(StorageTypeEnum.LOCAL.getValue());
+        sysFile.setStorageType(storageType.getValue());
         sysFile.setBasePath(result.getBasePath());
         sysFile.setBucket(result.getBucket());
         sysFile.setPath(result.getPath());
