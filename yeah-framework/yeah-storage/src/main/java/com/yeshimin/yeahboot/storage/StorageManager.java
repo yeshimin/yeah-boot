@@ -63,6 +63,14 @@ public class StorageManager {
     }
 
     /**
+     * 获取最终使用的存储类型
+     */
+    public StorageTypeEnum getStorageType(@Nullable StorageTypeEnum storageType) {
+        this.checkEnabled();
+        return this.getProvider(storageType).getStorageType();
+    }
+
+    /**
      * 全参方法
      */
     public SysStorageEntity put(@Nullable String bucketName, @Nullable String path, Object file,

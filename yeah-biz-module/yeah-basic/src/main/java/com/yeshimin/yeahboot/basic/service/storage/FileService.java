@@ -51,10 +51,11 @@ public class FileService extends BaseService {
      */
     @Transactional(rollbackFor = Exception.class)
     public FileUploadVo upload(MultipartFile file, StorageTypeEnum storageType) {
+        StorageTypeEnum finalStorageType = storageManager.getStorageType(storageType);
         // 决定bucket，除了local存储方式需要使用this.bucket，其他方式都指定为null
-        String bucket = storageType == StorageTypeEnum.LOCAL ? this.bucket : null;
+        String bucket = finalStorageType == StorageTypeEnum.LOCAL ? this.bucket : null;
         // 存储文件
-        SysStorageEntity result = storageManager.put(bucket, this.path, file, storageType, false, true);
+        SysStorageEntity result = storageManager.put(bucket, this.path, file, finalStorageType, false, true);
         if (!result.getSuccess()) {
             log.info("result: {}", JSON.toJSONString(result));
             throw new BaseException(ErrorCodeEnum.FAIL, "文件存储失败");
@@ -62,7 +63,7 @@ public class FileService extends BaseService {
 
         // 添加文件记录
         SysFileEntity sysFile = new SysFileEntity();
-        sysFile.setStorageType(storageType.getValue());
+        sysFile.setStorageType(result.getStorageType());
         sysFile.setBasePath(result.getBasePath());
         sysFile.setBucket(result.getBucket());
         sysFile.setPath(result.getPath());
