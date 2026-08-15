@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yeshimin.yeahboot.auth.service.TokenService;
 import com.yeshimin.yeahboot.common.common.enums.AuthSubjectEnum;
 import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
+import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
 import com.yeshimin.yeahboot.common.domain.base.IdNameVo;
@@ -59,6 +60,10 @@ public class SysUserService {
         // 检查：用户名是否已存在
         if (sysUserRepo.countByUsername(dto.getUsername()) > 0) {
             throw new BaseException("用户名已存在");
+        }
+        // 检查：超级管理员不能禁用
+        if (DataStatusEnum.DISABLED.equalsValue(dto.getStatus()) && this.isSuperAdminUsername(dto.getUsername())) {
+            throw new BaseException("超级管理员不能禁用");
         }
         // 检查：组织是否存在
         if (CollUtil.isNotEmpty(dto.getOrgIds())) {
@@ -220,9 +225,19 @@ public class SysUserService {
      * 更新
      */
     @Transactional(rollbackFor = Exception.class)
-    public SysUserEntity update(SysUserUpdateDto dto) {
+    public SysUserEntity update(Long userId, SysUserUpdateDto dto) {
         // 检查：是否存在
         SysUserEntity entity = sysUserRepo.getOneById(dto.getId());
+        // 检查：不能禁用自己
+        if (DataStatusEnum.DISABLED.equalsValue(dto.getStatus()) && Objects.equals(userId, entity.getId())) {
+            throw new BaseException("不能禁用自己");
+        }
+        // 检查：超级管理员不能禁用
+        String nextUsername = StrUtil.isNotBlank(dto.getUsername()) ? dto.getUsername() : entity.getUsername();
+        if (DataStatusEnum.DISABLED.equalsValue(dto.getStatus())
+                && (this.isSuperAdmin(entity) || this.isSuperAdminUsername(nextUsername))) {
+            throw new BaseException("超级管理员不能禁用");
+        }
         // 检查：用户名是否冲突
         if (StrUtil.isNotBlank(dto.getUsername()) && !Objects.equals(entity.getUsername(), dto.getUsername())) {
             if (sysUserRepo.countByUsername(dto.getUsername()) > 0) {
@@ -392,15 +407,15 @@ public class SysUserService {
         boolean permissionBypassed = this.isPermissionBypassed(user);
 
         // 1.查询用户对应的勾选的资源
-        List<Long> roleIds = sysUserRoleRepo.findListByUserId(userId)
-                .stream().map(SysUserRoleEntity::getRoleId).collect(Collectors.toList());
+        List<Long> roleIds = this.findEnabledRoleIdsByUserId(userId);
         Set<Long> checkedSet = permissionBypassed ? Collections.emptySet() :
                 sysRoleResRepo.findListByRoleIds(roleIds)
                         .stream().map(SysRoleResEntity::getResId).collect(Collectors.toSet());
 
         // 2.查询资源树
         List<SysUserResTreeNodeVo> listAllVo = sysResRepo.list()
-                .stream().map(e -> {
+                .stream().filter(this::isEnabled)
+                .map(e -> {
                     SysUserResTreeNodeVo vo = BeanUtil.copyProperties(e, SysUserResTreeNodeVo.class);
                     // 初始化子节点集合对象
                     vo.setChildren(new ArrayList<>());
@@ -553,19 +568,22 @@ public class SysUserService {
         if (user == null) {
             throw new BaseException("用户未找到");
         }
-
+        // 检查：用户是否已禁用
+        if (!this.isEnabled(user)) {
+            throw new BaseException(ErrorCodeEnum.FORBIDDEN, "用户已禁用");
+        }
         // 查询角色
-        List<Long> roleIds = sysUserRoleRepo.findListByUserId(userId)
-                .stream().map(SysUserRoleEntity::getRoleId).collect(Collectors.toList());
-        Set<String> roles = roleIds.isEmpty() ? Collections.emptySet() :
-                sysRoleRepo.listByIds(roleIds).stream()
-                        .map(SysRoleEntity::getCode).filter(StrUtil::isNotBlank).collect(Collectors.toSet());
+        List<SysRoleEntity> listRole = this.findEnabledRolesByUserId(userId);
+        List<Long> roleIds = listRole.stream().map(SysRoleEntity::getId).collect(Collectors.toList());
+        Set<String> roles = listRole.stream()
+                .map(SysRoleEntity::getCode).filter(StrUtil::isNotBlank).collect(Collectors.toSet());
 
         // 查询资源
         List<Long> resIds = sysRoleResRepo.findListByRoleIds(roleIds)
                 .stream().map(SysRoleResEntity::getResId).distinct().collect(Collectors.toList());
         Set<String> resources = resIds.isEmpty() ? Collections.emptySet() :
                 sysResRepo.listByIds(resIds).stream()
+                        .filter(this::isEnabled)
                         .map(SysResEntity::getPermission).filter(StrUtil::isNotBlank).collect(Collectors.toSet());
 
         UserRolesAndResourcesVo vo = new UserRolesAndResourcesVo();
@@ -582,9 +600,8 @@ public class SysUserService {
     public MineVo mine(Long userId) {
         SysUserEntity user = sysUserRepo.getOneById(userId);
 
-        List<Long> roleIds = sysUserRoleRepo.findListByUserId(userId)
-                .stream().map(SysUserRoleEntity::getRoleId).collect(Collectors.toList());
-        List<SysRoleEntity> roles = sysRoleRepo.findListByIds(roleIds);
+        List<SysRoleEntity> roles = this.findEnabledRolesByUserId(userId);
+        List<Long> roleIds = roles.stream().map(SysRoleEntity::getId).collect(Collectors.toList());
 
         List<Long> orgIds = sysUserOrgRepo.findListByUserId(userId)
                 .stream().map(SysUserOrgEntity::getOrgId).collect(Collectors.toList());
@@ -599,6 +616,7 @@ public class SysUserService {
                     .stream().map(SysRoleResEntity::getResId).distinct().collect(Collectors.toList());
             permissions = resIds.isEmpty() ? Collections.emptyList() :
                     sysResRepo.findListByIds(resIds).stream()
+                            .filter(this::isEnabled)
                             .map(SysResEntity::getPermission).filter(StrUtil::isNotBlank).collect(Collectors.toList());
         }
 
@@ -610,6 +628,35 @@ public class SysUserService {
         return vo;
     }
 
+    private List<SysRoleEntity> findEnabledRolesByUserId(Long userId) {
+        List<Long> roleIds = sysUserRoleRepo.findListByUserId(userId)
+                .stream().map(SysUserRoleEntity::getRoleId).distinct().collect(Collectors.toList());
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
+        return sysRoleRepo.findListByIds(roleIds).stream()
+                .filter(this::isEnabled)
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> findEnabledRoleIdsByUserId(Long userId) {
+        return this.findEnabledRolesByUserId(userId).stream()
+                .map(SysRoleEntity::getId)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isEnabled(SysUserEntity entity) {
+        return entity != null && DataStatusEnum.ENABLED.equalsValue(entity.getStatus());
+    }
+
+    private boolean isEnabled(SysRoleEntity entity) {
+        return entity != null && DataStatusEnum.ENABLED.equalsValue(entity.getStatus());
+    }
+
+    private boolean isEnabled(SysResEntity entity) {
+        return entity != null && DataStatusEnum.ENABLED.equalsValue(entity.getStatus());
+    }
+
     private boolean isPermissionBypassed(SysUserEntity user) {
         if (Objects.equals(Boolean.TRUE, yeahBootProperties.getSafeMode())) {
             return true;
@@ -618,10 +665,14 @@ public class SysUserService {
     }
 
     private boolean isSuperAdmin(SysUserEntity user) {
-        if (user == null || StrUtil.isBlank(yeahBootProperties.getSuperAdmin())) {
+        return user != null && this.isSuperAdminUsername(user.getUsername());
+    }
+
+    private boolean isSuperAdminUsername(String username) {
+        if (StrUtil.isBlank(yeahBootProperties.getSuperAdmin())) {
             return false;
         }
-        return Objects.equals(yeahBootProperties.getSuperAdmin(), user.getUsername());
+        return Objects.equals(yeahBootProperties.getSuperAdmin(), username);
     }
 
     // ================================================================================

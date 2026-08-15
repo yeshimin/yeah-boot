@@ -76,7 +76,8 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @PostMapping("/update")
     public R<SysUserEntity> update(@Valid @RequestBody SysUserUpdateDto dto) {
-        return R.ok(sysUserService.update(dto));
+        Long userId = WebContextUtils.getUserId();
+        return R.ok(sysUserService.update(userId, dto));
     }
 
     /**
