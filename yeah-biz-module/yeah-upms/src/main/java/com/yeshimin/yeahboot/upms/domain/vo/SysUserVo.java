@@ -1,6 +1,6 @@
 package com.yeshimin.yeahboot.upms.domain.vo;
 
-import com.yeshimin.yeahboot.common.domain.base.IdNameVo;
+import com.yeshimin.yeahboot.common.domain.base.IdNameStatusVo;
 import com.yeshimin.yeahboot.data.domain.entity.SysUserEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,15 +14,15 @@ public class SysUserVo extends SysUserEntity {
     /**
      * 岗位
      */
-    private List<IdNameVo> posts;
+    private List<IdNameStatusVo> posts;
 
     /**
      * 组织
      */
-    private List<IdNameVo> orgs;
+    private List<IdNameStatusVo> orgs;
 
     /**
      * 角色
      */
-    private List<IdNameVo> roles;
+    private List<IdNameStatusVo> roles;
 }

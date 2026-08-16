@@ -12,7 +12,7 @@ import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
-import com.yeshimin.yeahboot.common.domain.base.IdNameVo;
+import com.yeshimin.yeahboot.common.domain.base.IdNameStatusVo;
 import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
 import com.yeshimin.yeahboot.data.domain.entity.*;
@@ -139,7 +139,7 @@ public class SysUserService {
                 if (sysPost == null) {
                     return null;
                 }
-                return new IdNameVo(sysPost.getId(), sysPost.getName());
+                return new IdNameStatusVo(sysPost.getId(), sysPost.getName(), sysPost.getStatus());
             }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
             // 组织
@@ -149,7 +149,7 @@ public class SysUserService {
                 if (sysOrg == null) {
                     return null;
                 }
-                return new IdNameVo(sysOrg.getId(), sysOrg.getName());
+                return new IdNameStatusVo(sysOrg.getId(), sysOrg.getName(), sysOrg.getStatus());
             }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
             // 角色
@@ -159,7 +159,7 @@ public class SysUserService {
                 if (sysRole == null) {
                     return null;
                 }
-                return new IdNameVo(sysRole.getId(), sysRole.getName());
+                return new IdNameStatusVo(sysRole.getId(), sysRole.getName(), sysRole.getStatus());
             }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
             return vo;
         });
@@ -198,7 +198,7 @@ public class SysUserService {
             if (sysPost == null) {
                 return null;
             }
-            return new IdNameVo(sysPost.getId(), sysPost.getName());
+            return new IdNameStatusVo(sysPost.getId(), sysPost.getName(), sysPost.getStatus());
         }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
         // 组织
@@ -207,7 +207,7 @@ public class SysUserService {
             if (sysOrg == null) {
                 return null;
             }
-            return new IdNameVo(sysOrg.getId(), sysOrg.getName());
+            return new IdNameStatusVo(sysOrg.getId(), sysOrg.getName(), sysOrg.getStatus());
         }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 
         // 角色
@@ -216,7 +216,7 @@ public class SysUserService {
             if (sysRole == null) {
                 return null;
             }
-            return new IdNameVo(sysRole.getId(), sysRole.getName());
+            return new IdNameStatusVo(sysRole.getId(), sysRole.getName(), sysRole.getStatus());
         }).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         return vo;
     }

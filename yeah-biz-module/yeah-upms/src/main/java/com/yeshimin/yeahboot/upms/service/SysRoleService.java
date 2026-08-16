@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
-import com.yeshimin.yeahboot.common.domain.base.IdNameVo;
+import com.yeshimin.yeahboot.common.domain.base.IdNameStatusVo;
 import com.yeshimin.yeahboot.upms.domain.dto.SysRoleCreateDto;
 import com.yeshimin.yeahboot.upms.domain.dto.SysRoleResSetDto;
 import com.yeshimin.yeahboot.upms.domain.dto.SysRoleUpdateDto;
@@ -85,7 +85,7 @@ public class SysRoleService {
             if (sysRes == null) {
                 return null;
             }
-            return new IdNameVo(sysRes.getId(), sysRes.getName());
+            return new IdNameStatusVo(sysRes.getId(), sysRes.getName(), sysRes.getStatus());
         }).collect(Collectors.toList()));
 
         return vo;
