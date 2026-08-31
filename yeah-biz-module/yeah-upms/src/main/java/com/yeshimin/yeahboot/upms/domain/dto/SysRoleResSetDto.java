@@ -18,8 +18,13 @@ public class SysRoleResSetDto extends BaseDomain {
     private Long roleId;
 
     /**
-     * 资源ID集合
+     * 视图资源ID集合
      */
-    @NotNull(message = "资源ID集合不能为空")
-    private Set<Long> resIds;
+    @NotNull(message = "视图资源ID集合不能为空")
+    private Set<Long> viewResIds;
+
+    /**
+     * 挂载ID集合
+     */
+    private Set<Long> mountIds;
 }

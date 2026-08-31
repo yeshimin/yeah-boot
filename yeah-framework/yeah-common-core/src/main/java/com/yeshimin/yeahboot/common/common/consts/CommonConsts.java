@@ -21,7 +21,10 @@ public class CommonConsts {
     /**
      * 树形结构的根节点ID
      */
-    public static final long TREE_ROOT_ID = 0L;
+    public static final long ROOT_ID = 0L;
+
+    // 默认排序步长
+    public static final int DEFAULT_SORT_STEP = 10;
 
     public static final String PROJECT_NAME = "yeah-boot";
 

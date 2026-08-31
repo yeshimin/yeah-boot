@@ -5,26 +5,28 @@ import com.yeshimin.yeahboot.common.domain.base.ConditionBaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * 系统角色与资源关联表
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_role_res")
-public class SysRoleResEntity extends ConditionBaseEntity<SysRoleResEntity> {
+@TableName("sys_res_group")
+public class SysResGroupEntity extends ConditionBaseEntity<SysResGroupEntity> {
 
     /**
-     * 角色ID
+     * 父ID
      */
-    private Long roleId;
+    private Long parentId;
 
     /**
-     * 资源ID
+     * 名称
      */
-    private Long resId;
+    private String name;
 
     /**
-     * 挂载ID；0表示非挂载授权
+     * 排序
      */
-    private Long mountId;
+    private Integer sort;
+
+    /**
+     * 备注
+     */
+    private String remark;
 }

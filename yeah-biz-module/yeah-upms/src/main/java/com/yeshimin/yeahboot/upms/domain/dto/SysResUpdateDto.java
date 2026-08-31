@@ -21,7 +21,7 @@ public class SysResUpdateDto extends BaseDomain {
     private Long id;
 
     /**
-     * 类型：1-菜单 2-页面 3-按钮 4-接口
+     * 类型：1-菜单 2-页面 3-按钮 4-接口 5-分组
      */
     @EnumValue(enumClass = ResTypeEnum.class)
     private Integer type;
@@ -30,6 +30,11 @@ public class SysResUpdateDto extends BaseDomain {
      * 父ID
      */
     private Long parentId;
+
+    /**
+     * 接口资源分组ID，仅接口资源使用
+     */
+    private Long groupId;
 
     /**
      * 名称（父下唯一）

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class SysResCreateDto extends BaseDomain {
 
     /**
-     * 类型：1-菜单 2-页面 3-按钮 4-接口
+     * 类型：1-菜单 2-页面 3-按钮 4-接口 5-分组
      */
     @EnumValue(enumClass = ResTypeEnum.class)
     @NotNull(message = "类型不能为空")
@@ -26,6 +26,11 @@ public class SysResCreateDto extends BaseDomain {
      * 父ID
      */
     private Long parentId;
+
+    /**
+     * 接口资源分组ID，仅接口资源使用
+     */
+    private Long groupId;
 
     /**
      * 名称（父下唯一）

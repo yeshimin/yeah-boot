@@ -31,7 +31,11 @@ public class SysOrgController extends CrudController<SysOrgMapper, SysOrgEntity,
     public SysOrgController(SysOrgRepo service) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(service);
-        setModule("admin:sysOrg");
+        setModule("admin:sysOrg")
+                .disableCreate()
+                .disableQuery()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================

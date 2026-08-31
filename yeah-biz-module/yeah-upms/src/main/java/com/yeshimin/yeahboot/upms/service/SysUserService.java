@@ -18,6 +18,7 @@ import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
 import com.yeshimin.yeahboot.data.domain.entity.*;
 import com.yeshimin.yeahboot.data.repository.*;
 import com.yeshimin.yeahboot.storage.StorageManager;
+import com.yeshimin.yeahboot.upms.common.enums.ResTypeEnum;
 import com.yeshimin.yeahboot.upms.domain.dto.*;
 import com.yeshimin.yeahboot.upms.domain.vo.MineVo;
 import com.yeshimin.yeahboot.upms.domain.vo.SysUserResTreeNodeVo;
@@ -417,6 +418,10 @@ public class SysUserService {
                 .stream().filter(this::isEnabled)
                 .map(e -> {
                     SysUserResTreeNodeVo vo = BeanUtil.copyProperties(e, SysUserResTreeNodeVo.class);
+                    vo.setNodeKey("res:" + e.getId());
+                    vo.setResId(e.getId());
+                    vo.setTypeName(this.getResTypeName(e.getType()));
+                    vo.setMounted(Boolean.FALSE);
                     // 初始化子节点集合对象
                     vo.setChildren(new ArrayList<>());
                     return vo;
@@ -673,6 +678,11 @@ public class SysUserService {
             return false;
         }
         return Objects.equals(yeahBootProperties.getSuperAdmin(), username);
+    }
+
+    private String getResTypeName(Integer type) {
+        ResTypeEnum typeEnum = ResTypeEnum.of(String.valueOf(type));
+        return typeEnum == null ? "" : typeEnum.getDesc();
     }
 
     // ================================================================================

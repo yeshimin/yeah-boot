@@ -22,7 +22,7 @@ public class AreaProvinceController extends CrudController<AreaProvinceMapper, A
     public AreaProvinceController(AreaProvinceRepo areaProvinceRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(areaProvinceRepo);
-        setModule("admin:areaProvince");
+        setModule("admin:areaProvince").disableQuery();
     }
 
     // ================================================================================

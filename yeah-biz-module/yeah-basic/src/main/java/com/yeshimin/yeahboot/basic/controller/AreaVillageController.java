@@ -22,7 +22,12 @@ public class AreaVillageController extends CrudController<AreaVillageMapper, Are
     public AreaVillageController(AreaVillageRepo areaVillageRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(areaVillageRepo);
-        setModule("admin:areaVillage");
+        setModule("admin:areaVillage")
+                .disableCreate()
+                .disableQuery()
+                .disableDetail()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================

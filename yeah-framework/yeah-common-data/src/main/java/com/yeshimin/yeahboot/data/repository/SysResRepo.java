@@ -17,10 +17,20 @@ public class SysResRepo extends BaseRepo<SysResMapper, SysResEntity> {
      * countByParentIdAndName
      */
     public long countByParentIdAndName(Long parentId, String name) {
+        return this.countByParentIdAndName(parentId, name, null);
+    }
+
+    /**
+     * countByParentIdAndName
+     */
+    public long countByParentIdAndName(Long parentId, String name, Long excludeId) {
         LambdaQueryWrapper<SysResEntity> wrapper = Wrappers.lambdaQuery();
         // 如果parentId为空，默认为第一级
         wrapper.eq(SysResEntity::getParentId, parentId == null ? 0L : parentId);
         wrapper.eq(SysResEntity::getName, name);
+        if (excludeId != null) {
+            wrapper.ne(SysResEntity::getId, excludeId);
+        }
         return super.count(wrapper);
     }
 
@@ -47,14 +57,47 @@ public class SysResRepo extends BaseRepo<SysResMapper, SysResEntity> {
     }
 
     /**
+     * countByGroupId
+     */
+    public long countByGroupId(Long groupId) {
+        LambdaQueryWrapper<SysResEntity> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(SysResEntity::getGroupId, groupId);
+        return super.count(wrapper);
+    }
+
+    /**
+     * countByTypeAndGroupIdAndName
+     */
+    public long countByTypeAndGroupIdAndName(Integer type, Long groupId, String name, Long excludeId) {
+        LambdaQueryWrapper<SysResEntity> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(SysResEntity::getType, type);
+        wrapper.eq(SysResEntity::getGroupId, groupId == null ? 0L : groupId);
+        wrapper.eq(SysResEntity::getName, name);
+        if (excludeId != null) {
+            wrapper.ne(SysResEntity::getId, excludeId);
+        }
+        return super.count(wrapper);
+    }
+
+    /**
      * countByPermission
      */
     public long countByPermission(String permission) {
+        return this.countByPermission(permission, null);
+    }
+
+    /**
+     * countByPermission
+     */
+    public long countByPermission(String permission, Long excludeId) {
         if (StrUtil.isBlank(permission)) {
             throw new IllegalArgumentException("permission is blank");
         }
         LambdaQueryWrapper<SysResEntity> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(SysResEntity::getPermission, permission);
+        if (excludeId != null) {
+            wrapper.ne(SysResEntity::getId, excludeId);
+        }
         return super.count(wrapper);
     }
 }

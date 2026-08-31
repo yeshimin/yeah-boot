@@ -32,7 +32,11 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     public SysRoleController(SysRoleRepo sysRoleRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysRoleRepo);
-        setModule("admin:sysRole");
+        setModule("admin:sysRole")
+                .disableCreate()
+                .disableDetail()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================
@@ -90,7 +94,8 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':setResources')")
     @PostMapping("/setResources")
-    public R<Boolean> setResources(@Valid @RequestBody SysRoleResSetDto dto) {
-        return R.ok(sysRoleService.setResources(dto));
+    public R<Void> setResources(@Valid @RequestBody SysRoleResSetDto dto) {
+        sysRoleService.setResources(dto);
+        return R.ok();
     }
 }

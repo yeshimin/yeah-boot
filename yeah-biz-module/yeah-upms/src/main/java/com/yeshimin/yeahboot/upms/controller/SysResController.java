@@ -7,6 +7,7 @@ import com.yeshimin.yeahboot.upms.domain.dto.SysResCreateDto;
 import com.yeshimin.yeahboot.upms.domain.dto.SysResTreeQueryDto;
 import com.yeshimin.yeahboot.upms.domain.dto.SysResUpdateDto;
 import com.yeshimin.yeahboot.data.domain.entity.SysResEntity;
+import com.yeshimin.yeahboot.upms.domain.vo.SysResApiTreeNodeVo;
 import com.yeshimin.yeahboot.upms.domain.vo.SysResTreeNodeVo;
 import com.yeshimin.yeahboot.data.mapper.SysResMapper;
 import com.yeshimin.yeahboot.data.repository.SysResRepo;
@@ -31,7 +32,11 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     public SysResController(SysResRepo sysResRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysResRepo);
-        setModule("admin:sysRes");
+        setModule("admin:sysRes")
+                .disableCreate()
+                .disableQuery()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================
@@ -52,6 +57,24 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     @GetMapping("/tree")
     public R<List<SysResTreeNodeVo>> tree(SysResTreeQueryDto dto) {
         return R.ok(sysResService.tree(dto));
+    }
+
+    /**
+     * 查询视图资源树
+     */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':tree')")
+    @GetMapping("/viewTree")
+    public R<List<SysResTreeNodeVo>> viewTree(SysResTreeQueryDto dto) {
+        return R.ok(sysResService.viewTree(dto));
+    }
+
+    /**
+     * 查询接口资源树
+     */
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':tree')")
+    @GetMapping("/apiTree")
+    public R<List<SysResApiTreeNodeVo>> apiTree(SysResTreeQueryDto dto) {
+        return R.ok(sysResService.apiTree(dto));
     }
 
     /**

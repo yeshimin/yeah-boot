@@ -38,7 +38,12 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     public SysUserController(SysUserRepo sysUserRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysUserRepo);
-        setModule("admin:sysUser");
+        setModule("admin:sysUser")
+                .disableCreate()
+                .disableQuery()
+                .disableDetail()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================

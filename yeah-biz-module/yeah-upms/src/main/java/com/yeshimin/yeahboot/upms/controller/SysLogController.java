@@ -22,7 +22,11 @@ public class SysLogController extends CrudController<SysLogMapper, SysLogEntity,
     public SysLogController(SysLogRepo sysPostRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysPostRepo);
-        setModule("admin:sysLog");
+        setModule("admin:sysLog")
+                .disableCreate()
+                .disableDetail()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================

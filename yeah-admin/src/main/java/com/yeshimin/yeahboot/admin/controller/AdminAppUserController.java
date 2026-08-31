@@ -24,7 +24,12 @@ public class AdminAppUserController extends CrudController<AppUserMapper, AppUse
     public AdminAppUserController(AppUserRepo repo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(repo);
-        super.setModule("admin:appUser");
+        super.setModule("admin:appUser")
+                .disableCreate()
+                .disableQuery()
+                .disableDetail()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================

@@ -31,7 +31,10 @@ public class SysPostController extends CrudController<SysPostMapper, SysPostEnti
     public SysPostController(SysPostRepo sysPostRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysPostRepo);
-        super.setModule("admin:sysPost");
+        super.setModule("admin:sysPost")
+                .disableCreate()
+                .disableUpdate()
+                .disableDelete();
     }
 
     // ================================================================================
