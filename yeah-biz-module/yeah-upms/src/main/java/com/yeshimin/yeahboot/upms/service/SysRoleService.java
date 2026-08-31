@@ -54,20 +54,8 @@ public class SysRoleService {
         if (sysRoleRepo.countByName(dto.getName()) > 0) {
             throw new BaseException("名称已存在");
         }
-        // 检查：资源是否存在
-        if (CollUtil.isNotEmpty(dto.getResIds())) {
-            if (sysResRepo.countByIds(dto.getResIds()) != dto.getResIds().size()) {
-                throw new BaseException("资源ID不正确");
-            }
-        }
-
         // 创建记录
-        SysRoleEntity entity = sysRoleRepo.createOne(dto.getCode(), dto.getName(), dto.getStatus(), dto.getRemark());
-
-        // 创建角色与资源的关联记录
-        sysRoleResRepo.createRoleResRelations(entity.getId(), dto.getResIds());
-
-        return entity;
+        return sysRoleRepo.createOne(dto.getCode(), dto.getName(), dto.getStatus(), dto.getRemark());
     }
 
     /**
@@ -117,18 +105,6 @@ public class SysRoleService {
             if (sysRoleRepo.countByName(dto.getName()) > 0) {
                 throw new BaseException("名称已存在");
             }
-        }
-        // 检查：资源是否存在
-        if (CollUtil.isNotEmpty(dto.getResIds())) {
-            if (sysResRepo.countByIds(dto.getResIds()) != dto.getResIds().size()) {
-                throw new BaseException("资源ID不正确");
-            }
-        }
-
-        // 清空并重新创建角色与资源的关联记录
-        if (dto.getResIds() != null) {
-            sysRoleResRepo.deleteByRoleId(dto.getId());
-            sysRoleResRepo.createRoleResRelations(dto.getId(), dto.getResIds());
         }
 
         BeanUtil.copyProperties(dto, entity);

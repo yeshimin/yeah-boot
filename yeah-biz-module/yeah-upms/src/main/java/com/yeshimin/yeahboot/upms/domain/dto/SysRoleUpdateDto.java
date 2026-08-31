@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -40,8 +39,4 @@ public class SysRoleUpdateDto extends BaseDomain {
      */
     private String remark;
 
-    /**
-     * 资源ID集合
-     */
-    private Set<Long> resIds;
 }
