@@ -1,7 +1,7 @@
 package com.yeshimin.yeahboot.basic.controller;
 
 import com.yeshimin.yeahboot.basic.domain.vo.FileUploadVo;
-import com.yeshimin.yeahboot.basic.domain.dto.FileDeleteDto;
+import com.yeshimin.yeahboot.basic.domain.dto.StorageDeleteDto;
 import com.yeshimin.yeahboot.basic.service.storage.StorageService;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
@@ -85,7 +85,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @PostMapping("/delete")
-    public R<Void> delete(@Valid @RequestBody FileDeleteDto dto) {
+    public R<Void> delete(@Valid @RequestBody StorageDeleteDto dto) {
         storageService.delete(dto);
         return R.ok();
     }

@@ -2,7 +2,7 @@ package com.yeshimin.yeahboot.basic.service.storage;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson2.JSON;
-import com.yeshimin.yeahboot.basic.domain.dto.FileDeleteDto;
+import com.yeshimin.yeahboot.basic.domain.dto.StorageDeleteDto;
 import com.yeshimin.yeahboot.basic.domain.vo.FileUploadVo;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,6 +69,21 @@ public class StorageService extends BaseService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void delete(String fileKey) {
+        this.delete(fileKey, false);
+    }
+
+    /**
+     * 删除文件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(String fileKey, boolean force) {
+        SysStorageEntity sysStorage = sysStorageRepo.findOneByFileKey(fileKey);
+        if (sysStorage == null) {
+            return;
+        }
+        if (!force && Boolean.TRUE.equals(sysStorage.getIsUsed())) {
+            throw new BaseException(ErrorCodeEnum.FAIL, "存储文件正在使用，不能直接删除");
+        }
         // 删除存储
         storageManager.delete(fileKey);
     }
@@ -75,18 +92,24 @@ public class StorageService extends BaseService {
      * 批量删除文件
      */
     @Transactional(rollbackFor = Exception.class)
-    public void delete(FileDeleteDto dto) {
+    public void delete(StorageDeleteDto dto) {
+        Set<String> fileKeys = new HashSet<>();
         if (CollectionUtil.isNotEmpty(dto.getIds())) {
-            Set<String> fileKeys = sysStorageRepo.findListByIds(dto.getIds())
+            fileKeys = sysStorageRepo.findListByIds(dto.getIds())
                     .stream().map(SysStorageEntity::getFileKey).collect(Collectors.toSet());
-            if (CollectionUtil.isNotEmpty(fileKeys)) {
-                fileKeys.forEach(this::delete);
-            }
+        } else if (CollectionUtil.isNotEmpty(dto.getFileKeys())) {
+            fileKeys.addAll(dto.getFileKeys());
+        }
+
+        if (CollectionUtil.isEmpty(fileKeys)) {
             return;
         }
 
-        if (CollectionUtil.isNotEmpty(dto.getFileKeys())) {
-            dto.getFileKeys().forEach(this::delete);
+        List<SysStorageEntity> list = sysStorageRepo.findListByFileKeys(fileKeys);
+        boolean force = Boolean.TRUE.equals(dto.getForce());
+        if (!force && list.stream().anyMatch(e -> Boolean.TRUE.equals(e.getIsUsed()))) {
+            throw new BaseException(ErrorCodeEnum.FAIL, "部分存储文件正在使用，不能直接删除");
         }
+        list.forEach(e -> storageManager.delete(e.getFileKey()));
     }
 }
