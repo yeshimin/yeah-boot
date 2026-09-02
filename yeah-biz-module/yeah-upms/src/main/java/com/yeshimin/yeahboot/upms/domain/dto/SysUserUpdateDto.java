@@ -1,6 +1,9 @@
 package com.yeshimin.yeahboot.upms.domain.dto;
 
 import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveData;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveScene;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveType;
 import com.yeshimin.yeahboot.common.common.validation.EnumValue;
 import lombok.Data;
 
@@ -39,6 +42,7 @@ public class SysUserUpdateDto {
     /**
      * 密码
      */
+    @SensitiveData(scenes = SensitiveScene.LOG)
     private String password;
 
     /**
@@ -60,11 +64,13 @@ public class SysUserUpdateDto {
     /**
      * 手机号
      */
+    @SensitiveData(type = SensitiveType.MOBILE, scenes = SensitiveScene.LOG)
     private String mobile;
 
     /**
      * 邮箱
      */
+    @SensitiveData(type = SensitiveType.EMAIL, scenes = SensitiveScene.LOG)
     private String email;
 
     /**

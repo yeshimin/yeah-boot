@@ -1,7 +1,7 @@
 package com.yeshimin.yeahboot.common.common.log;
 
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveDataUtils;
 import com.yeshimin.yeahboot.common.domain.entity.SysLogEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class SysLogAspect {
         // 收集输入参数
         try {
             Object[] args = joinPoint.getArgs();
-            String inputJson = JSONUtil.toJsonStr(args);
+            String inputJson = SensitiveDataUtils.toLogJson(args);
             logEntity.setInput(inputJson);
         } catch (Exception e) {
             log.warn("参数序列化异常", e);
@@ -67,7 +67,7 @@ public class SysLogAspect {
                 if (result != null) {
                     boolean loggable = this.isLoggable(result);
                     if (loggable) {
-                        String outputJson = JSONUtil.toJsonStr(result);
+                        String outputJson = SensitiveDataUtils.toLogJson(result);
                         logEntity.setOutput(outputJson);
                     } else {
                         logEntity.setOutput("[非文本响应，已跳过日志输出]");

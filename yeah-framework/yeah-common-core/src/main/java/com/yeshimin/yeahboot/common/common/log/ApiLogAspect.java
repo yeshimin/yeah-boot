@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.common.common.log;
 
 import com.alibaba.fastjson2.JSON;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveDataUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -87,14 +88,15 @@ public class ApiLogAspect {
         Enumeration<String> eNames = request.getParameterNames();
         while (eNames.hasMoreElements()) {
             String name = eNames.nextElement();
-            parameters.add(name + "=" + request.getParameter(name));
+            parameters.add(name + "=" + SensitiveDataUtils.maskLogParameter(
+                    name, request.getParameter(name), args));
         }
         if (!parameters.isEmpty()) {
             sbOutput.append(" - ").append(String.join(";", parameters));
         }
         // HTTP请求体参数，有则输出
         if (bodyIdx >= 0) {
-            sbOutput.append(" - ").append(JSON.toJSONString(args[bodyIdx]));
+            sbOutput.append(" - ").append(SensitiveDataUtils.toLogJson(args[bodyIdx]));
         }
         // Java（全限定）方法名称
         sbOutput.append(" - ").append(methodSignature.getDeclaringTypeName())
@@ -105,7 +107,7 @@ public class ApiLogAspect {
         if (result != null) {
             boolean loggable = this.isLoggable(result);
             if (loggable) {
-                sbOutput.append(" - return: ").append(JSON.toJSONString(result));
+                sbOutput.append(" - return: ").append(SensitiveDataUtils.toLogJson(result));
             } else {
                 sbOutput.append(" - return: [非文本响应，已跳过日志输出]");
             }

@@ -2,6 +2,9 @@ package com.yeshimin.yeahboot.data.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveData;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveScene;
+import com.yeshimin.yeahboot.common.common.sensitive.SensitiveType;
 import com.yeshimin.yeahboot.common.domain.base.ConditionBaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -22,6 +25,7 @@ public class AppUserEntity extends ConditionBaseEntity<AppUserEntity> {
      * 手机号
      */
     @Schema(description = "手机号")
+    @SensitiveData(type = SensitiveType.MOBILE, scenes = SensitiveScene.LOG)
     private String mobile;
 
     /**
@@ -29,6 +33,7 @@ public class AppUserEntity extends ConditionBaseEntity<AppUserEntity> {
      */
     @JsonIgnore
     @Schema(description = "登录密码")
+    @SensitiveData(scenes = SensitiveScene.LOG)
     private String password;
 
     /**
