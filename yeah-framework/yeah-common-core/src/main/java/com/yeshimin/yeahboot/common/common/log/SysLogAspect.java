@@ -29,8 +29,8 @@ public class SysLogAspect {
 
         // 设置注解信息
         logEntity.setEvent(sysLog.value());
-        logEntity.setTriggerType(sysLog.triggerType());
-        logEntity.setCategory(sysLog.category());
+        logEntity.setTriggerType(sysLog.triggerType().getValue());
+        logEntity.setCategory(sysLog.category().getValue());
 
         // 方法名、类名
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();

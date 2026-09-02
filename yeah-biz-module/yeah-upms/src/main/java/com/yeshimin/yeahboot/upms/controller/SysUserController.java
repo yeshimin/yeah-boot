@@ -2,6 +2,8 @@ package com.yeshimin.yeahboot.upms.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
@@ -52,6 +54,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 创建
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
+    @SysLog(value = "创建用户", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysUserEntity> create(@Valid @RequestBody SysUserCreateDto dto) {
         return R.ok(sysUserService.create(dto));
@@ -79,6 +82,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 更新
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
+    @SysLog(value = "更新用户", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysUserEntity> update(@Valid @RequestBody SysUserUpdateDto dto) {
         Long userId = WebContextUtils.getUserId();
@@ -89,6 +93,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 删除
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除用户", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         Long userId = WebContextUtils.getUserId();
@@ -111,6 +116,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 用户挂载角色（全部量操作）
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':setUserRoles')")
+    @SysLog(value = "设置用户角色", category = SysLogCategoryEnum.DATA)
     @PostMapping("/setUserRoles")
     public R<Boolean> setUserRoles(@Valid @RequestBody UserRoleSetDto dto) {
         return R.ok(sysUserService.setUserRoles(dto));
@@ -140,6 +146,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 用户挂载组织（全部量操作）
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':setUserOrgs')")
+    @SysLog(value = "设置用户组织", category = SysLogCategoryEnum.DATA)
     @PostMapping("/setUserOrgs")
     public R<Boolean> setUserOrgs(@Valid @RequestBody UserOrgSetDto dto) {
         return R.ok(sysUserService.setUserOrgs(dto));
@@ -166,6 +173,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 更新用户个人信息
      */
+    @SysLog(value = "更新用户个人信息", category = SysLogCategoryEnum.DATA)
     @PostMapping("/updateMine")
     public R<Void> updateMine(@Valid @RequestBody SysUserUpdateMineDto dto) {
         Long userId = WebContextUtils.getUserId();
@@ -188,6 +196,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 用户挂载岗位（全部量操作）
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':setUserPosts')")
+    @SysLog(value = "设置用户岗位", category = SysLogCategoryEnum.DATA)
     @PostMapping("/setUserPosts")
     public R<Boolean> setUserPosts(@Valid @RequestBody UserPostSetDto dto) {
         return R.ok(sysUserService.setUserPosts(dto));

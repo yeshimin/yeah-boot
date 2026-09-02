@@ -5,7 +5,9 @@ import com.yeshimin.yeahboot.basic.domain.dto.StorageDeleteDto;
 import com.yeshimin.yeahboot.basic.service.storage.StorageService;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.common.utils.YsmUtils;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -67,6 +69,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      * 下载文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':download')")
+    @SysLog(value = "下载存储文件", category = SysLogCategoryEnum.FILE)
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> download(@RequestParam("fileKey") String fileKey) {
         return storageService.download(fileKey, false);
@@ -84,6 +87,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      * 删除文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除存储文件", category = SysLogCategoryEnum.FILE)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody StorageDeleteDto dto) {
         storageService.delete(dto);

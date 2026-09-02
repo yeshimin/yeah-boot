@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.auth.controller;
 
 import com.yeshimin.yeahboot.auth.service.AuthService;
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.BaseController;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -25,7 +26,7 @@ public class AuthController extends BaseController {
     /**
      * 退出登录
      */
-    @SysLog("退出登录")
+    @SysLog(value = "退出登录", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/logout")
     public R<ResultVo> logout() {
         return R.ok(authService.logout());

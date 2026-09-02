@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -44,6 +46,7 @@ public class SysOrgController extends CrudController<SysOrgMapper, SysOrgEntity,
      * 创建
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
+    @SysLog(value = "创建组织", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysOrgEntity> create(@Valid @RequestBody SysOrgCreateDto dto) {
         return R.ok(sysOrgService.create(dto));
@@ -62,6 +65,7 @@ public class SysOrgController extends CrudController<SysOrgMapper, SysOrgEntity,
      * 更新
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
+    @SysLog(value = "更新组织", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysOrgEntity> update(@Valid @RequestBody SysOrgUpdateDto dto) {
         return R.ok(sysOrgService.update(dto));
@@ -71,6 +75,7 @@ public class SysOrgController extends CrudController<SysOrgMapper, SysOrgEntity,
      * 删除
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除组织", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         sysOrgService.delete(dto.getIds());

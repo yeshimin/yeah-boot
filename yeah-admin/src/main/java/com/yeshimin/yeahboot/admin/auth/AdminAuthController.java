@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.admin.auth;
 
 import cn.hutool.core.util.BooleanUtil;
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.auth.common.config.security.PublicAccess;
 import com.yeshimin.yeahboot.auth.domain.vo.CaptchaVo;
 import com.yeshimin.yeahboot.auth.service.CaptchaService;
@@ -34,7 +35,7 @@ public class AdminAuthController extends BaseController {
      * 登录
      */
     @PublicAccess
-    @SysLog("登录")
+    @SysLog(value = "登录", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/login")
     public R<LoginVo> login(@Valid @RequestBody LoginDto dto) {
         if (BooleanUtil.isTrue(yeahBootProperties.getCaptchaEnabled())) {

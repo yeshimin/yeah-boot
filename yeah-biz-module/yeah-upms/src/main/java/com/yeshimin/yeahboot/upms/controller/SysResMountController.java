@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.R;
 import com.yeshimin.yeahboot.data.domain.entity.SysResMountEntity;
@@ -55,6 +57,7 @@ public class SysResMountController extends CrudController<SysResMountMapper, Sys
      * 保存视图资源挂载接口（全量操作）
      */
     @PreAuthorize("@pms.hasPermission('admin:sysResMount:save')")
+    @SysLog(value = "设置视图资源接口", category = SysLogCategoryEnum.DATA)
     @PostMapping("/saveByViewResId")
     public R<Boolean> saveByViewResId(@Valid @RequestBody SysResMountSaveDto dto) {
         return R.ok(sysResMountService.saveByViewResId(dto));

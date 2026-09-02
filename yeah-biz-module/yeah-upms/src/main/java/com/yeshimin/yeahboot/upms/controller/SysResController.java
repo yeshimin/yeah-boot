@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -45,6 +47,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
      * 创建
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
+    @SysLog(value = "创建资源", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysResEntity> create(@Valid @RequestBody SysResCreateDto dto) {
         return R.ok(sysResService.create(dto));
@@ -81,6 +84,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
      * 更新
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
+    @SysLog(value = "更新资源", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysResEntity> update(@Valid @RequestBody SysResUpdateDto dto) {
         return R.ok(sysResService.update(dto));
@@ -90,6 +94,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
      * 删除
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除资源", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto ids) {
         sysResService.delete(ids.getIds());

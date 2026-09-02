@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -57,6 +59,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
      * 创建
      */
     @PreAuthorize("@pms.hasPermission('admin:sysResGroup:create')")
+    @SysLog(value = "创建接口资源分组", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysResGroupEntity> create(@Valid @RequestBody SysResGroupCreateDto dto) {
         return R.ok(sysResGroupService.create(dto));
@@ -66,6 +69,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
      * 更新
      */
     @PreAuthorize("@pms.hasPermission('admin:sysResGroup:update')")
+    @SysLog(value = "更新接口资源分组", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysResGroupEntity> update(@Valid @RequestBody SysResGroupUpdateDto dto) {
         return R.ok(sysResGroupService.update(dto));
@@ -75,6 +79,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
      * 删除
      */
     @PreAuthorize("@pms.hasPermission('admin:sysResGroup:delete')")
+    @SysLog(value = "删除接口资源分组", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         sysResGroupService.delete(dto.getIds());

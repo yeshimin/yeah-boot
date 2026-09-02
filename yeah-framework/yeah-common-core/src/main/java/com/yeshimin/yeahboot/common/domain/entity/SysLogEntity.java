@@ -15,12 +15,12 @@ import lombok.EqualsAndHashCode;
 public class SysLogEntity extends ConditionBaseEntity<SysLogEntity> {
 
     /**
-     * 触发类型：1-系统自动 2-用户手动
+     * 触发类型：1-系统触发 2-用户触发
      */
     private String triggerType;
 
     /**
-     * 事件类型：1-鉴权相关（登录、登出、续期等） 2-数据操作 3-定时任务
+     * 事件类型：0-无 1-鉴权相关（登录、登出、续期等） 2-数据操作 3-定时任务 4-上传下载
      */
     private String category;
 

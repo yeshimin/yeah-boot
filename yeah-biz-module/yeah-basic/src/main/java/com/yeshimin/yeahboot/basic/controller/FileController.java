@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.basic.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.data.domain.entity.SysFileEntity;
 import com.yeshimin.yeahboot.basic.domain.dto.FileDeleteDto;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
@@ -59,6 +61,7 @@ public class FileController extends CrudController<SysFileMapper, SysFileEntity,
      * 下载文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':download')")
+    @SysLog(value = "下载文件", category = SysLogCategoryEnum.FILE)
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> download(@RequestParam("fileKey") String fileKey) {
         return fileService.download(fileKey);
@@ -68,6 +71,7 @@ public class FileController extends CrudController<SysFileMapper, SysFileEntity,
      * 删除文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除文件", category = SysLogCategoryEnum.FILE)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody FileDeleteDto dto) {
         fileService.delete(dto);

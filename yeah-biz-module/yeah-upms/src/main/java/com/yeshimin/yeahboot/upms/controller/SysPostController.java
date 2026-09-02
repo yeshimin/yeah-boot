@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -43,6 +45,7 @@ public class SysPostController extends CrudController<SysPostMapper, SysPostEnti
      * 创建
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
+    @SysLog(value = "创建岗位", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysPostEntity> create(@Valid @RequestBody SysPostCreateDto dto) {
         return R.ok(sysPostService.create(dto));
@@ -52,6 +55,7 @@ public class SysPostController extends CrudController<SysPostMapper, SysPostEnti
      * 更新
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
+    @SysLog(value = "更新岗位", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysPostEntity> update(@Valid @RequestBody SysPostUpdateDto dto) {
         return R.ok(sysPostService.update(dto));
@@ -61,6 +65,7 @@ public class SysPostController extends CrudController<SysPostMapper, SysPostEnti
      * 删除
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除岗位", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         sysPostService.delete(dto.getIds());

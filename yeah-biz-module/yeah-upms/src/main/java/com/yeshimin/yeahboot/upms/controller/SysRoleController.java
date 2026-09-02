@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -45,6 +47,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
      * 创建
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
+    @SysLog(value = "创建角色", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysRoleEntity> create(@Valid @RequestBody SysRoleCreateDto dto) {
         return R.ok(sysRoleService.create(dto));
@@ -63,6 +66,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
      * 更新
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
+    @SysLog(value = "更新角色", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysRoleEntity> update(@Valid @RequestBody SysRoleUpdateDto dto) {
         return R.ok(sysRoleService.update(dto));
@@ -72,6 +76,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
      * 删除
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
+    @SysLog(value = "删除角色", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
         sysRoleService.delete(dto.getIds());
@@ -93,6 +98,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
      * 角色挂载资源（全量操作）
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':setResources')")
+    @SysLog(value = "设置角色资源", category = SysLogCategoryEnum.DATA)
     @PostMapping("/setResources")
     public R<Void> setResources(@Valid @RequestBody SysRoleResSetDto dto) {
         sysRoleService.setResources(dto);
