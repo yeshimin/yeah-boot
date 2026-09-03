@@ -1,6 +1,8 @@
 package com.yeshimin.yeahboot.auth.common.config.security;
 
+import com.alibaba.fastjson2.JSON;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
+import com.yeshimin.yeahboot.common.domain.base.R;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
@@ -17,7 +19,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         ErrorCodeEnum errorCode = ErrorCodeEnum.FORBIDDEN;
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"code\":" + errorCode.getCode() +
-                ",\"message\":\"" + errorCode.getDesc() + "\"}");
+        response.getWriter().write(JSON.toJSONString(R.fail(errorCode)));
     }
 }

@@ -1,8 +1,10 @@
 package com.yeshimin.yeahboot.common.domain.base;
 
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
+import com.yeshimin.yeahboot.common.common.log.MdcLogFilter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.slf4j.MDC;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -13,6 +15,11 @@ public class R<T> extends BaseDomain {
     private String message;
 
     private T data;
+
+    /**
+     * 请求链路标识，与日志MDC中的reqId保持一致
+     */
+    private String traceId;
 
     private static final Object EMPTY_DATA = new Object();
 
@@ -66,5 +73,6 @@ public class R<T> extends BaseDomain {
         this.code = code;
         this.message = message;
         this.data = data;
+        this.traceId = MDC.get(MdcLogFilter.MDC_REQ_ID);
     }
 }
