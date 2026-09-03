@@ -67,12 +67,8 @@ public class SysUserService {
         if (DataStatusEnum.DISABLED.equalsValue(dto.getStatus()) && this.isSuperAdminUsername(dto.getUsername())) {
             throw new BaseException("超级管理员不能禁用");
         }
-        // 检查：组织是否存在
-        if (CollUtil.isNotEmpty(dto.getOrgIds())) {
-            if (sysOrgRepo.countByIds(dto.getOrgIds()) != dto.getOrgIds().size()) {
-                throw new BaseException("组织ID不正确");
-            }
-        }
+        // 检查：组织、岗位和角色是否存在
+        this.validateRelationIds(dto.getOrgIds(), dto.getPostIds(), dto.getRoleIds());
 
         // 密码加密
         String encodedPassword = passwordService.encodePassword(dto.getPassword());
@@ -246,12 +242,8 @@ public class SysUserService {
                 throw new BaseException("用户名已存在");
             }
         }
-        // 检查：组织是否存在
-        if (CollUtil.isNotEmpty(dto.getOrgIds())) {
-            if (sysOrgRepo.countByIds(dto.getOrgIds()) != dto.getOrgIds().size()) {
-                throw new BaseException("组织ID不正确");
-            }
-        }
+        // 检查：组织、岗位和角色是否存在
+        this.validateRelationIds(dto.getOrgIds(), dto.getPostIds(), dto.getRoleIds());
 
         // 清空并重新创建用户与组织关联记录
         if (dto.getOrgIds() != null) {
@@ -672,6 +664,21 @@ public class SysUserService {
             return false;
         }
         return Objects.equals(yeahBootProperties.getSuperAdmin(), username);
+    }
+
+    /**
+     * 校验用户关联的组织、岗位和角色ID
+     */
+    private void validateRelationIds(Set<Long> orgIds, Set<Long> postIds, Set<Long> roleIds) {
+        if (CollUtil.isNotEmpty(orgIds) && sysOrgRepo.countByIds(orgIds) != orgIds.size()) {
+            throw new BaseException("组织ID不正确");
+        }
+        if (CollUtil.isNotEmpty(postIds) && sysPostRepo.countByIds(postIds) != postIds.size()) {
+            throw new BaseException("岗位ID不正确");
+        }
+        if (CollUtil.isNotEmpty(roleIds) && sysRoleRepo.countByIds(roleIds) != roleIds.size()) {
+            throw new BaseException("角色ID不正确");
+        }
     }
 
     private String getResTypeName(Integer type) {
