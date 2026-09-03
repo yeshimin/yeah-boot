@@ -90,6 +90,17 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     }
 
     /**
+     * 重置用户密码
+     */
+    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:resetPassword')")
+    @SysLog(value = "重置用户密码", category = SysLogCategoryEnum.AUTH)
+    @PostMapping("/resetPassword")
+    public R<Void> resetPassword(@Valid @RequestBody SysUserResetPasswordDto dto) {
+        sysUserService.resetPassword(dto);
+        return R.ok();
+    }
+
+    /**
      * 删除
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")

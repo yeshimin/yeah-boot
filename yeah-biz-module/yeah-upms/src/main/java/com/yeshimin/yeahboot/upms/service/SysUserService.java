@@ -268,14 +268,6 @@ public class SysUserService {
         // 更新用户信息
         BeanUtil.copyProperties(dto, entity);
 
-        // 密码
-        if (StrUtil.isNotBlank(dto.getPassword())) {
-            entity.setPassword(passwordService.encodePassword(dto.getPassword()));
-        } else {
-            // 置空，跳过更新
-            entity.setPassword(null);
-        }
-
         // 按需更新头像
         if (StrUtil.isNotBlank(dto.getAvatar()) && !Objects.equals(dto.getAvatar(), oldAvatar)) {
             storageManager.markUse(dto.getAvatar());
@@ -293,6 +285,16 @@ public class SysUserService {
             tokenService.deleteUserTokens(AuthSubjectEnum.ADMIN.getValue(), String.valueOf(entity.getId()));
         }
         return entity;
+    }
+
+    /**
+     * 重置用户密码
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPassword(SysUserResetPasswordDto dto) {
+        SysUserEntity entity = sysUserRepo.getOneById(dto.getId());
+        entity.setPassword(passwordService.encodePassword(dto.getPassword()));
+        entity.updateById();
     }
 
     /**

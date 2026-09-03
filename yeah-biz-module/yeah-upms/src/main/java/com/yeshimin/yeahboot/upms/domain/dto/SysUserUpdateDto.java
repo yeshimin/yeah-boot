@@ -40,12 +40,6 @@ public class SysUserUpdateDto {
     private String username;
 
     /**
-     * 密码
-     */
-    @SensitiveData(scenes = SensitiveScene.LOG)
-    private String password;
-
-    /**
      * 状态：1-启用 2-禁用
      */
     @EnumValue(enumClass = DataStatusEnum.class)

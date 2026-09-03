@@ -6,6 +6,7 @@ import com.yeshimin.yeahboot.common.domain.base.R;
 import com.yeshimin.yeahboot.ws.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ public class AdminTestController extends BaseController {
     /**
      * 发送websocket消息测试
      */
+    @PreAuthorize("@pms.hasPermission('api:admin:test:wsSend')")
     @PostMapping("/wsSend")
     public R<Void> wsSend(@RequestBody String message) {
         wsService.sendMessageToUser(message, AuthSubjectEnum.ADMIN.getValue(), String.valueOf(1L));
@@ -34,6 +36,7 @@ public class AdminTestController extends BaseController {
     /**
      * websocket广播测试
      */
+    @PreAuthorize("@pms.hasPermission('api:admin:test:wsBroadcast')")
     @PostMapping("/wsBroadcast")
     public R<Void> wsBroadcast(@RequestBody String message) {
         wsService.sendMessageBroadcast(message, AuthSubjectEnum.ADMIN.getValue());
