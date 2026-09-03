@@ -63,6 +63,14 @@ mybatis-plus:
 
 # auth相关
 auth:
+  # 管理端登录相关配置
+  admin-login:
+    # 登录失败次数统计窗口，单位：秒
+    failure-window-seconds: 600
+    # 达到该失败次数后临时锁定
+    max-failure-count: 5
+    # 临时锁定时长，单位：秒
+    lock-seconds: 600
   token:
     # 全局jwt配置（subject中可覆盖）
     jwt:
