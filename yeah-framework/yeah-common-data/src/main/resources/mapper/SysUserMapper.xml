@@ -31,4 +31,17 @@
         </if>
     </select>
 
+    <!-- 查询用户运行时鉴权所需的有效角色编码和权限标识 -->
+    <select id="queryAuthResources" resultType="com.yeshimin.yeahboot.data.domain.vo.SysUserAuthResourceVo">
+        select distinct r.code as roleCode, sr.permission
+        from sys_user_role ur
+        inner join sys_role r on r.id = ur.role_id and r.deleted = 0 and r.status = '1'
+        left join sys_role_res rr on rr.role_id = r.id and rr.deleted = 0
+        left join sys_res sr on sr.id = rr.res_id
+            and sr.deleted = 0 and sr.status = '1'
+            and sr.permission is not null and sr.permission != ''
+        where ur.deleted = 0
+          and ur.user_id = #{userId}
+    </select>
+
 </mapper>

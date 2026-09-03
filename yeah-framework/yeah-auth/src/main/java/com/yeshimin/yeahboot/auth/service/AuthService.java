@@ -147,7 +147,7 @@ public class AuthService {
                 success = !requestUri.startsWith(prefix);
             }
 
-            log.info("isEqOp: {}, prefix: {}, requestUri: {}, success: {}", isEqOp, prefix, requestUri, success);
+            log.debug("isEqOp: {}, prefix: {}, requestUri: {}, success: {}", isEqOp, prefix, requestUri, success);
             if (success) {
                 return success;
             }

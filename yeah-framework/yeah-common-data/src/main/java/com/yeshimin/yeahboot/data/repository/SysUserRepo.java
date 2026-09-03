@@ -4,12 +4,15 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yeshimin.yeahboot.common.repository.base.BaseRepo;
+import com.yeshimin.yeahboot.data.domain.vo.SysUserAuthResourceVo;
 import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
 import com.yeshimin.yeahboot.data.domain.entity.SysUserEntity;
 import com.yeshimin.yeahboot.data.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Slf4j
 @Repository
@@ -26,6 +29,16 @@ public class SysUserRepo extends BaseRepo<SysUserMapper, SysUserEntity> {
             throw new IllegalArgumentException("username不能为空");
         }
         return this.lambdaQuery().eq(SysUserEntity::getUsername, username).one();
+    }
+
+    /**
+     * 查询用户运行时鉴权所需的有效角色编码和权限标识
+     */
+    public List<SysUserAuthResourceVo> queryAuthResources(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId不能为空");
+        }
+        return sysUserMapper.queryAuthResources(userId);
     }
 
     /**

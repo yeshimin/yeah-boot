@@ -15,6 +15,7 @@ import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
 import com.yeshimin.yeahboot.common.domain.base.IdNameStatusVo;
 import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
+import com.yeshimin.yeahboot.data.domain.vo.SysUserAuthResourceVo;
 import com.yeshimin.yeahboot.data.domain.entity.*;
 import com.yeshimin.yeahboot.data.repository.*;
 import com.yeshimin.yeahboot.storage.StorageManager;
@@ -577,19 +578,12 @@ public class SysUserService {
         if (!this.isEnabled(user)) {
             throw new BaseException(ErrorCodeEnum.FORBIDDEN, "用户已禁用");
         }
-        // 查询角色
-        List<SysRoleEntity> listRole = this.findEnabledRolesByUserId(userId);
-        List<Long> roleIds = listRole.stream().map(SysRoleEntity::getId).collect(Collectors.toList());
-        Set<String> roles = listRole.stream()
-                .map(SysRoleEntity::getCode).filter(StrUtil::isNotBlank).collect(Collectors.toSet());
-
-        // 查询资源
-        List<Long> resIds = sysRoleResRepo.findListByRoleIds(roleIds)
-                .stream().map(SysRoleResEntity::getResId).distinct().collect(Collectors.toList());
-        Set<String> resources = resIds.isEmpty() ? Collections.emptySet() :
-                sysResRepo.listByIds(resIds).stream()
-                        .filter(this::isEnabled)
-                        .map(SysResEntity::getPermission).filter(StrUtil::isNotBlank).collect(Collectors.toSet());
+        // 一次关联查询获取有效角色编码和有效权限标识；挂载关系只作为授权来源，最终鉴权按权限标识取并集
+        List<SysUserAuthResourceVo> authResources = sysUserRepo.queryAuthResources(userId);
+        Set<String> roles = authResources.stream().map(SysUserAuthResourceVo::getRoleCode)
+                .filter(StrUtil::isNotBlank).collect(Collectors.toSet());
+        Set<String> resources = authResources.stream().map(SysUserAuthResourceVo::getPermission)
+                .filter(StrUtil::isNotBlank).collect(Collectors.toSet());
 
         UserRolesAndResourcesVo vo = new UserRolesAndResourcesVo();
         vo.setUser(user);
