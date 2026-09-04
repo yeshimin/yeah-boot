@@ -41,15 +41,6 @@
         <include refid="queryConditions" />
     </select>
 
-    <!-- 查询用户列表（不分页） -->
-    <select id="queryList" resultType="com.yeshimin.yeahboot.data.domain.entity.SysUserEntity">
-        select u.*
-        from sys_user u
-        <include refid="queryConditions" />
-        order by u.id desc
-        limit #{limit}
-    </select>
-
     <!-- 查询用户运行时鉴权所需的有效角色编码和权限标识 -->
     <select id="queryAuthResources" resultType="com.yeshimin.yeahboot.data.domain.vo.SysUserAuthResourceVo">
         select distinct r.code as roleCode, sr.permission

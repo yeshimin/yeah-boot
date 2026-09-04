@@ -77,13 +77,6 @@ public class SysUserRepo extends BaseRepo<SysUserMapper, SysUserEntity> {
     }
 
     /**
-     * 查询用户列表（不分页）
-     */
-    public List<SysUserEntity> queryList(SysUserQueryDto dto, int limit) {
-        return sysUserMapper.queryList(dto, limit);
-    }
-
-    /**
      * 查询已存在的用户名集合
      */
     public Set<String> findExistingUsernames(Collection<String> usernames) {
