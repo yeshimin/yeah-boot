@@ -4,6 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import ${basePackage}.common.domain.base.ConditionBaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+<#list importEntityPackages as pkg>
+    <#if pkg != "com.baomidou.mybatisplus.annotation.TableName"
+            && pkg != "lombok.Data"
+            && pkg != "lombok.EqualsAndHashCode">
+import ${pkg};
+    </#if>
+</#list>
 
 /**
  * ${table.comment!}
