@@ -18,6 +18,7 @@ import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
 import com.yeshimin.yeahboot.data.domain.entity.SysUserEntity;
 import com.yeshimin.yeahboot.data.repository.SysUserRepo;
+import com.yeshimin.yeahboot.upms.common.properties.SysUserExcelProperties;
 import com.yeshimin.yeahboot.upms.domain.excel.SysUserExportExcelRow;
 import com.yeshimin.yeahboot.upms.domain.excel.SysUserImportExcelRow;
 import com.yeshimin.yeahboot.upms.domain.excel.SysUserImportInstructionExcelRow;
@@ -48,10 +49,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SysUserExcelService {
 
-    private static final long MAX_IMPORT_FILE_SIZE = 5 * 1024 * 1024;
-    private static final int MAX_IMPORT_ROWS = 1000;
-    private static final int MAX_EXPORT_ROWS = 10000;
-    private static final int MAX_ERROR_MESSAGES = 20;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final List<String> IMPORT_HEADERS = Arrays.asList(
@@ -60,6 +57,7 @@ public class SysUserExcelService {
     private final SysUserRepo sysUserRepo;
     private final PasswordService passwordService;
     private final YeahBootProperties yeahBootProperties;
+    private final SysUserExcelProperties excelProperties;
 
     /**
      * 生成用户导入模板
@@ -128,9 +126,10 @@ public class SysUserExcelService {
      * 导出用户基础信息，不导出密码、头像和关联数据
      */
     public byte[] exportUsers(SysUserQueryDto dto) {
-        List<SysUserEntity> users = sysUserRepo.query(Page.of(1, MAX_EXPORT_ROWS), dto).getRecords();
-        if (users.size() > MAX_EXPORT_ROWS) {
-            throw new BaseException("单次最多导出" + MAX_EXPORT_ROWS + "条用户数据，请增加筛选条件后重试");
+        int maxExportRows = excelProperties.getMaxExportRows();
+        List<SysUserEntity> users = sysUserRepo.query(Page.of(1, (long) maxExportRows + 1), dto).getRecords();
+        if (users.size() > maxExportRows) {
+            throw new BaseException("单次最多导出" + maxExportRows + "条用户数据，请增加筛选条件后重试");
         }
 
         List<SysUserExportExcelRow> rows = users.stream().map(this::toExportRow).collect(Collectors.toList());
@@ -149,8 +148,8 @@ public class SysUserExcelService {
         if (file == null || file.isEmpty()) {
             throw new BaseException("请选择用户导入文件");
         }
-        if (file.getSize() > MAX_IMPORT_FILE_SIZE) {
-            throw new BaseException("用户导入文件不能超过5MB");
+        if (file.getSize() > excelProperties.getMaxImportFileSizeMb() * 1024 * 1024) {
+            throw new BaseException("用户导入文件不能超过" + excelProperties.getMaxImportFileSizeMb() + "MB");
         }
         String fileName = file.getOriginalFilename();
         if (StrUtil.isBlank(fileName) || !StrUtil.endWithIgnoreCase(fileName, ".xlsx")) {
@@ -159,7 +158,7 @@ public class SysUserExcelService {
     }
 
     private List<SysUserImportExcelRow> readImportRows(MultipartFile file) {
-        ImportListener listener = new ImportListener();
+        ImportListener listener = new ImportListener(excelProperties.getMaxImportRows());
         try (InputStream inputStream = file.getInputStream()) {
             EasyExcel.read(inputStream, SysUserImportExcelRow.class, listener)
                     .autoCloseStream(false)
@@ -201,9 +200,10 @@ public class SysUserExcelService {
 
         if (!errors.isEmpty()) {
             int errorCount = errors.size();
-            String message = errors.stream().limit(MAX_ERROR_MESSAGES).collect(Collectors.joining("；"));
-            if (errorCount > MAX_ERROR_MESSAGES) {
-                message += "；另有" + (errorCount - MAX_ERROR_MESSAGES) + "条错误未展示";
+            int maxErrorMessages = excelProperties.getMaxErrorMessages();
+            String message = errors.stream().limit(maxErrorMessages).collect(Collectors.joining("；"));
+            if (errorCount > maxErrorMessages) {
+                message += "；另有" + (errorCount - maxErrorMessages) + "条错误未展示";
             }
             throw new BaseException("用户导入校验失败：" + message);
         }
@@ -305,6 +305,11 @@ public class SysUserExcelService {
     private static class ImportListener extends AnalysisEventListener<SysUserImportExcelRow> {
 
         private final List<SysUserImportExcelRow> rows = new ArrayList<>();
+        private final int maxImportRows;
+
+        private ImportListener(int maxImportRows) {
+            this.maxImportRows = maxImportRows;
+        }
 
         @Override
         public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
@@ -317,8 +322,8 @@ public class SysUserExcelService {
 
         @Override
         public void invoke(SysUserImportExcelRow data, AnalysisContext context) {
-            if (rows.size() >= MAX_IMPORT_ROWS) {
-                throw new BaseException("单次最多导入" + MAX_IMPORT_ROWS + "条用户数据");
+            if (rows.size() >= maxImportRows) {
+                throw new BaseException("单次最多导入" + maxImportRows + "条用户数据");
             }
             data.setRowNumber(context.readRowHolder().getRowIndex() + 1);
             rows.add(data);
