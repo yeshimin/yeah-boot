@@ -1,10 +1,12 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
+import com.yeshimin.yeahboot.common.common.utils.YsmUtils;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -17,14 +19,23 @@ import com.yeshimin.yeahboot.data.mapper.SysUserMapper;
 import com.yeshimin.yeahboot.data.repository.SysUserRepo;
 import com.yeshimin.yeahboot.upms.domain.dto.*;
 import com.yeshimin.yeahboot.upms.domain.vo.MineVo;
+import com.yeshimin.yeahboot.upms.domain.vo.SysUserImportResultVo;
 import com.yeshimin.yeahboot.upms.domain.vo.SysUserResTreeNodeVo;
 import com.yeshimin.yeahboot.upms.domain.vo.SysUserVo;
+import com.yeshimin.yeahboot.upms.service.SysUserExcelService;
 import com.yeshimin.yeahboot.upms.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,6 +47,8 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
 
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private SysUserExcelService sysUserExcelService;
 
     public SysUserController(SysUserRepo sysUserRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
@@ -110,6 +123,34 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
         Long userId = WebContextUtils.getUserId();
         sysUserService.delete(userId, dto.getIds());
         return R.ok();
+    }
+
+    /**
+     * 下载用户导入模板
+     */
+    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:importTemplate')")
+    @GetMapping("/importTemplate")
+    public ResponseEntity<byte[]> importTemplate() {
+        return this.buildExcelResponse(sysUserExcelService.createImportTemplate(), "用户导入模板.xlsx");
+    }
+
+    /**
+     * 导入用户
+     */
+    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:import')")
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public R<SysUserImportResultVo> importUsers(@RequestParam("file") MultipartFile file) {
+        return R.ok(sysUserExcelService.importUsers(file));
+    }
+
+    /**
+     * 导出用户
+     */
+    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:export')")
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportUsers(SysUserQueryDto dto) {
+        String fileName = "用户数据_" + DateUtil.format(new Date(), "yyyyMMddHHmmss") + ".xlsx";
+        return this.buildExcelResponse(sysUserExcelService.exportUsers(dto), fileName);
     }
 
     // ================================================================================
@@ -211,5 +252,15 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     @PostMapping("/setUserPosts")
     public R<Boolean> setUserPosts(@Valid @RequestBody UserPostSetDto dto) {
         return R.ok(sysUserService.setUserPosts(dto));
+    }
+
+    private ResponseEntity<byte[]> buildExcelResponse(byte[] data, String fileName) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDisposition(
+                ContentDisposition.attachment().filename(fileName, StandardCharsets.UTF_8).build());
+        headers.setContentLength(data.length);
+        return ResponseEntity.ok().headers(headers).body(data);
     }
 }

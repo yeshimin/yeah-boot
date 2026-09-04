@@ -12,7 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -73,13 +77,26 @@ public class SysUserRepo extends BaseRepo<SysUserMapper, SysUserEntity> {
     }
 
     /**
-     * countByMobile
+     * 查询用户列表（不分页）
      */
-    public long countByMobile(String mobile) {
-        if (StrUtil.isBlank(mobile)) {
-            throw new IllegalArgumentException("mobile不能为空");
+    public List<SysUserEntity> queryList(SysUserQueryDto dto, int limit) {
+        return sysUserMapper.queryList(dto, limit);
+    }
+
+    /**
+     * 查询已存在的用户名集合
+     */
+    public Set<String> findExistingUsernames(Collection<String> usernames) {
+        if (usernames == null || usernames.isEmpty()) {
+            return Collections.emptySet();
         }
-        return this.lambdaQuery().eq(SysUserEntity::getMobile, mobile).count();
+        return this.lambdaQuery()
+                .select(SysUserEntity::getUsername)
+                .in(SysUserEntity::getUsername, usernames)
+                .list()
+                .stream()
+                .map(SysUserEntity::getUsername)
+                .collect(Collectors.toSet());
     }
 
     /**

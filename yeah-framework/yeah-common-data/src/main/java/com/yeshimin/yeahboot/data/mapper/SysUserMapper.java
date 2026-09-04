@@ -20,6 +20,11 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
     IPage<SysUserEntity> query(Page<SysUserEntity> page, @Param("query") SysUserQueryDto dto);
 
     /**
+     * 查询用户列表（不分页）
+     */
+    List<SysUserEntity> queryList(@Param("query") SysUserQueryDto dto, @Param("limit") int limit);
+
+    /**
      * 查询用户运行时鉴权所需的有效角色编码和权限标识
      */
     List<SysUserAuthResourceVo> queryAuthResources(@Param("userId") Long userId);

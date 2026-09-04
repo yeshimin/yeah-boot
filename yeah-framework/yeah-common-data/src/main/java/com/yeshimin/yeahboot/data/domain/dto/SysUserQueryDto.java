@@ -15,6 +15,11 @@ import java.util.Set;
 public class SysUserQueryDto extends BaseDomain {
 
     /**
+     * 用户ID集合
+     */
+    private Set<Long> ids;
+
+    /**
      * 用户名
      */
     private String username;

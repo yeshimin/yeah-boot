@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -103,7 +104,7 @@ public class ApiLogAspect {
                 .append(".").append(methodSignature.getName())
                 .append(" - time: ").append(System.currentTimeMillis() - startTime.get()).append("ms");
 
-        // 优化：java.io.FileNotFoundException: InputStream resource [resource loaded through InputStream] cannot be resolved to URL
+        // 非文本响应无法安全转换为日志文本，例如InputStreamResource无法解析为URL
         if (result != null) {
             boolean loggable = this.isLoggable(result);
             if (loggable) {
@@ -121,8 +122,13 @@ public class ApiLogAspect {
     private boolean isLoggable(Object result) {
         if (result == null) return true;
 
+        if (result instanceof ResponseEntity) {
+            return this.isLoggable(((ResponseEntity<?>) result).getBody());
+        }
+
         // 快速排除常见类型
-        if (result instanceof java.io.InputStream ||
+        if (result instanceof byte[] ||
+                result instanceof java.io.InputStream ||
                 result instanceof org.springframework.core.io.Resource ||
                 result instanceof javax.servlet.ServletRequest ||
                 result instanceof javax.servlet.ServletResponse ||

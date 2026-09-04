@@ -484,14 +484,10 @@ public class SysUserService {
         if (StrUtil.isNotBlank(dto.getNickname())) {
             entity.setNickname(dto.getNickname());
         }
-        // 手机号，确认校验格式，并且确保唯一
+        // 手机号，确认校验格式
         if (StrUtil.isNotBlank(dto.getMobile()) && !Objects.equals(dto.getMobile(), entity.getMobile())) {
             if (!Validator.isMobile(dto.getMobile())) {
                 throw new BaseException("手机号格式不正确");
-            }
-            if (!Objects.equals(entity.getMobile(), dto.getMobile())
-                    && sysUserRepo.countByMobile(dto.getMobile()) > 0) {
-                throw new BaseException("手机号已存在");
             }
             entity.setMobile(dto.getMobile());
         }

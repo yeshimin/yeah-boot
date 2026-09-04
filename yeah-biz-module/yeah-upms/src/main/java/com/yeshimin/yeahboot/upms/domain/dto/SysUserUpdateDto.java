@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.upms.domain.dto;
 
 import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
+import com.yeshimin.yeahboot.common.common.enums.GenderEnum;
 import com.yeshimin.yeahboot.common.common.sensitive.SensitiveData;
 import com.yeshimin.yeahboot.common.common.sensitive.SensitiveScene;
 import com.yeshimin.yeahboot.common.common.sensitive.SensitiveType;
@@ -8,6 +9,7 @@ import com.yeshimin.yeahboot.common.common.validation.EnumValue;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Data
@@ -37,6 +39,7 @@ public class SysUserUpdateDto {
     /**
      * 用户名
      */
+    @Size(min = 2, max = 32, message = "用户名长度必须在2到32个字符之间")
     private String username;
 
     /**
@@ -48,6 +51,7 @@ public class SysUserUpdateDto {
     /**
      * 昵称
      */
+    @Size(max = 32, message = "昵称不能超过32个字符")
     private String nickname;
 
     /**
@@ -68,8 +72,9 @@ public class SysUserUpdateDto {
     private String email;
 
     /**
-     * 性别：1-男性 2-女性
+     * 性别：0-未知 1-男性 2-女性
      */
+    @EnumValue(enumClass = GenderEnum.class)
     private String gender;
 
     /**

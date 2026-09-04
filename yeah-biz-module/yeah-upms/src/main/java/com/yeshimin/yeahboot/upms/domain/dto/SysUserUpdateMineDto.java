@@ -9,6 +9,8 @@ import com.yeshimin.yeahboot.common.domain.base.BaseDomain;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.Size;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysUserUpdateMineDto extends BaseDomain {
@@ -28,6 +30,7 @@ public class SysUserUpdateMineDto extends BaseDomain {
     /**
      * 昵称
      */
+    @Size(max = 32, message = "昵称不能超过32个字符")
     private String nickname;
 
     /**
@@ -48,7 +51,7 @@ public class SysUserUpdateMineDto extends BaseDomain {
     private String email;
 
     /**
-     * 性别：1-男性 2-女性
+     * 性别：0-未知 1-男性 2-女性
      */
     @EnumValue(enumClass = GenderEnum.class)
     private String gender;

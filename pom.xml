@@ -43,6 +43,7 @@
         <dysmsapi.version>4.1.0</dysmsapi.version>
         <dyvmsapi.version>3.2.2</dyvmsapi.version>
         <disruptor.version>3.4.4</disruptor.version>
+        <easyexcel.version>4.0.3</easyexcel.version>
     </properties>
 
     <dependencyManagement>
@@ -80,6 +81,13 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- Alibaba EasyExcel -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
             </dependency>
 
             <!-- ================================================================================ -->
