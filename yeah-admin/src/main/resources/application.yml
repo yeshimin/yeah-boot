@@ -208,3 +208,9 @@ yeah-boot:
       interval: 30
       # 心跳检测超时时间（秒）
       timeout: 90
+  # 系统用户导入/导出相关
+  sys-user-excel:
+    max-import-file-size-mb: 5
+    max-import-rows: 1000
+    max-export-rows: 10000
+    max-error-messages: 20
