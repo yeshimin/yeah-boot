@@ -59,7 +59,7 @@ public class SysUserEntity extends ConditionBaseEntity<SysUserEntity> {
     /**
      * 性别：0-未知 1-男性 2-女性
      */
-    private String gender;
+    private Integer gender;
 
     /**
      * 备注

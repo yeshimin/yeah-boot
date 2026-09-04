@@ -45,7 +45,7 @@ public class SysUserImportExcelRow {
 
     @ExcelProperty(value = "性别（0未知/1男/2女）", index = 6)
     @ColumnWidth(12)
-    private String gender;
+    private Integer gender;
 
     @ExcelProperty(value = "备注", index = 7)
     @ColumnWidth(36)

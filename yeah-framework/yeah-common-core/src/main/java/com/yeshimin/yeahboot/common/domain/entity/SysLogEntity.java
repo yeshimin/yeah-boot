@@ -17,12 +17,12 @@ public class SysLogEntity extends ConditionBaseEntity<SysLogEntity> {
     /**
      * 触发类型：1-系统触发 2-用户触发
      */
-    private String triggerType;
+    private Integer triggerType;
 
     /**
      * 事件类型：0-无 1-鉴权相关（登录、登出、续期等） 2-数据操作 3-定时任务 4-上传下载
      */
-    private String category;
+    private Integer category;
 
     /**
      * 事件
@@ -46,9 +46,9 @@ public class SysLogEntity extends ConditionBaseEntity<SysLogEntity> {
     private Integer time;
 
     /**
-     * 是否成功
+     * 是否成功：1-成功 0-失败
      */
-    private String success;
+    private Integer success;
 
     /**
      * 额外信息（json字符串）

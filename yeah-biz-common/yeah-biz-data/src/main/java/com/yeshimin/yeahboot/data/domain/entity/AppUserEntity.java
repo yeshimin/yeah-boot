@@ -55,9 +55,9 @@ public class AppUserEntity extends ConditionBaseEntity<AppUserEntity> {
     private String avatar;
 
     /**
-     * 性别
+     * 性别：0-未知 1-男性 2-女性
      */
-    @Schema(description = "性别")
+    @Schema(description = "性别：0-未知 1-男性 2-女性")
     private Integer gender;
 
     /**

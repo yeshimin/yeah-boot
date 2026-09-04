@@ -54,5 +54,5 @@ public class SysUserUpdateMineDto extends BaseDomain {
      * 性别：0-未知 1-男性 2-女性
      */
     @EnumValue(enumClass = GenderEnum.class)
-    private String gender;
+    private Integer gender;
 }

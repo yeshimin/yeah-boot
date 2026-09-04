@@ -499,7 +499,7 @@ public class SysUserService {
             entity.setEmail(dto.getEmail());
         }
         // 性别
-        if (StrUtil.isNotBlank(dto.getGender())) {
+        if (dto.getGender() != null) {
             entity.setGender(dto.getGender());
         }
 

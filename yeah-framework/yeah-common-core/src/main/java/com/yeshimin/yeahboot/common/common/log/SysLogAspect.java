@@ -29,8 +29,8 @@ public class SysLogAspect {
 
         // 设置注解信息
         logEntity.setEvent(sysLog.value());
-        logEntity.setTriggerType(sysLog.triggerType().getValue());
-        logEntity.setCategory(sysLog.category().getValue());
+        logEntity.setTriggerType(sysLog.triggerType().getIntValue());
+        logEntity.setCategory(sysLog.category().getIntValue());
 
         // 方法名、类名
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -53,13 +53,13 @@ public class SysLogAspect {
             return result;
         } catch (Throwable e) {
             success = false;
-            logEntity.setSuccess("0");
+            logEntity.setSuccess(0);
             logEntity.setExtra("{\"exception\": \"" + e.getMessage() + "\"}");
             throw e;
         } finally {
             long end = System.currentTimeMillis();
             logEntity.setTime((int) (end - start));
-            logEntity.setSuccess(success ? "1" : "0");
+            logEntity.setSuccess(success ? 1 : 0);
 
             // 收集输出结果
             try {

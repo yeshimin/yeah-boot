@@ -216,7 +216,7 @@ public class SysUserExcelService {
         row.setNickname(StrUtil.trim(row.getNickname()));
         row.setMobile(StrUtil.trim(row.getMobile()));
         row.setEmail(StrUtil.trim(row.getEmail()));
-        row.setGender(StrUtil.blankToDefault(StrUtil.trim(row.getGender()), GenderEnum.UNKNOWN.getValue()));
+        row.setGender(row.getGender() == null ? GenderEnum.UNKNOWN.getIntValue() : row.getGender());
         row.setRemark(StrUtil.trim(row.getRemark()));
     }
 
@@ -254,7 +254,7 @@ public class SysUserExcelService {
         if (StrUtil.length(row.getEmail()) > 64) {
             errors.add(rowPrefix + "邮箱不能超过64个字符");
         }
-        if (GenderEnum.of(row.getGender()) == null) {
+        if (GenderEnum.of(String.valueOf(row.getGender())) == null) {
             errors.add(rowPrefix + "性别只能填写0、1或2");
         }
         if (DataStatusEnum.DISABLED.equalsValue(row.getStatus())
@@ -297,9 +297,9 @@ public class SysUserExcelService {
         return statusEnum == null ? StrUtil.nullToEmpty(status) : statusEnum.getDesc();
     }
 
-    private String getGenderLabel(String gender) {
-        GenderEnum genderEnum = GenderEnum.of(gender);
-        return genderEnum == null ? StrUtil.nullToEmpty(gender) : genderEnum.getDesc();
+    private String getGenderLabel(Integer gender) {
+        GenderEnum genderEnum = GenderEnum.of(String.valueOf(gender));
+        return genderEnum == null ? Objects.toString(gender, "") : genderEnum.getDesc();
     }
 
     private static class ImportListener extends AnalysisEventListener<SysUserImportExcelRow> {
