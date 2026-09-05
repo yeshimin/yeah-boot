@@ -22,7 +22,7 @@ public enum GenderEnum implements IValueEnum {
     }
 
     public static GenderEnum of(String value) {
-        for (GenderEnum e : GenderEnum.values()) {
+        for (GenderEnum e : values()) {
             if (e.getValue().equals(value)) {
                 return e;
             }

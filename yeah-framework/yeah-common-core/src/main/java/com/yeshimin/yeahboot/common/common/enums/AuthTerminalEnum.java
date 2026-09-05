@@ -25,7 +25,7 @@ public enum AuthTerminalEnum implements IValueEnum {
     }
 
     public static AuthTerminalEnum of(String value) {
-        for (AuthTerminalEnum e : AuthTerminalEnum.values()) {
+        for (AuthTerminalEnum e : values()) {
             if (e.getValue().equals(value)) {
                 return e;
             }

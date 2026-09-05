@@ -68,7 +68,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             log.debug("Not a method handler, skip");
             return true;
@@ -101,7 +103,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (rlConf.getLimitCount() > -1) {
             log.debug("check for [limitCount]");
 
-            plainWindow = plainHolder.computeIfAbsent(rlConf.getResName(), k -> new SlidingWindow(rlConf, "[limitCount]"));
+            plainWindow = plainHolder.computeIfAbsent(rlConf.getResName(),
+                    k -> new SlidingWindow(rlConf, "[limitCount]"));
             log.debug("plainWindow: {}", plainWindow);
 
             boolean allowed = plainWindow.tryAcquire(rlConf.getLimitCount(), rlConf.getReqTime());
@@ -123,7 +126,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             outerGroupMap.entrySet().removeIf(entry -> {
                 long reqTime = entry.getValue();
                 if (reqTime < rlConf.getWindowFrom()) {
-                    log.debug("Remove expired group:{}, windowFrom: {}, reqTime: {}", entry.getKey(), rlConf.getWindowFrom(), reqTime);
+                    log.debug("Remove expired group:{}, windowFrom: {}, reqTime: {}",
+                            entry.getKey(), rlConf.getWindowFrom(), reqTime);
                     return true;
                 }
                 return false;
@@ -150,8 +154,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (rlConf.getLimitGroupCount() > -1) {
             log.debug("check for [limitGroupCount]");
 
-            ConcurrentHashMap<String, SlidingWindow> map = innerGroupHolder.computeIfAbsent(rlConf.getResName(), k -> new ConcurrentHashMap<>());
-            innerGroupWindow = map.computeIfAbsent(rlConf.getGroupName(), k -> new SlidingWindow(rlConf, "[limitGroupCount]"));
+            ConcurrentHashMap<String, SlidingWindow> map = innerGroupHolder.computeIfAbsent(
+                    rlConf.getResName(), k -> new ConcurrentHashMap<>());
+            innerGroupWindow = map.computeIfAbsent(rlConf.getGroupName(),
+                    k -> new SlidingWindow(rlConf, "[limitGroupCount]"));
             log.debug("innerGroupWindow: {}", innerGroupWindow);
 
             boolean allowed = innerGroupWindow.tryAcquire(rlConf.getLimitGroupCount(), rlConf.getReqTime());
@@ -301,7 +307,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
         public void increase(long reqTime) {
             // 当前时间对应的桶++
-            int index = (int) ((reqTime / bucketSizeMs) % bucketCount);
+            int index = (int) (reqTime / bucketSizeMs % bucketCount);
             buckets[index].incrementAndGet();
             // print buckets
             log.debug("{} buckets: {}", logFlag, Arrays.toString(buckets));
@@ -316,7 +322,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             long globalBucketsPassed = globalBucketIndex - lastGlobalBucketIndex;
 
             // log
-            log.debug("{} slideWindow: reqTime={}, globalBucketIndex={}, globalBucketsPassed={}, lastGlobalBucketIndex={}",
+            log.debug("{} slideWindow: reqTime={}, globalBucketIndex={}, "
+                            + "globalBucketsPassed={}, lastGlobalBucketIndex={}",
                     logFlag, reqTime, globalBucketIndex, globalBucketsPassed, lastGlobalBucketIndex);
 
             // 如果时间没有过去一个桶的大小，直接返回
@@ -342,7 +349,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
             lastUpdateTime = reqTime;
             lastGlobalBucketIndex = reqTime / bucketSizeMs;
-            log.debug("{} slideWindow: lastUpdateTime={}, lastGlobalBucketIndex={}", logFlag, lastUpdateTime, lastGlobalBucketIndex);
+            log.debug("{} slideWindow: lastUpdateTime={}, lastGlobalBucketIndex={}",
+                    logFlag, lastUpdateTime, lastGlobalBucketIndex);
         }
 
         /**
@@ -374,7 +382,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
                     long lastReq = window.getLastReqTime();
                     boolean expired = (now - lastReq > GROUP_EXPIRE_MS) && (now - lastReq > window.windowSizeMs);
-                    log.debug("[RateLimitCleaner] group={} (resName={}) lastReq={}, expiredMs={}, GROUP_EXPIRE_MS={}, windowSizeMs={}",
+                    log.debug("[RateLimitCleaner] group={} (resName={}) lastReq={}, expiredMs={}, "
+                                    + "GROUP_EXPIRE_MS={}, windowSizeMs={}",
                             group, resName, lastReq, now - lastReq, GROUP_EXPIRE_MS, window.windowSizeMs);
                     if (expired) {
                         // CAS 删除：确保删除的是当前 value，防止误删

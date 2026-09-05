@@ -2,7 +2,6 @@ package com.yeshimin.yeahboot.common.common.log;
 
 import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -17,7 +16,6 @@ import java.util.UUID;
  * MDC日志过滤器
  * 另有相关逻辑见AuthService.auth()方法
  */
-@Slf4j
 public class MdcLogFilter extends GenericFilterBean {
 
     public static final String MDC_INFO = "mdc-info";

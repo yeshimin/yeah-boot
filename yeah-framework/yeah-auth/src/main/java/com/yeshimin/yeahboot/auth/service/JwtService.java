@@ -114,26 +114,6 @@ public class JwtService {
     }
 
     /**
-     * 验证Jwt
-     */
-//    public boolean validJwt(String jwt) {
-//        return validJwt(jwt, null);
-//    }
-
-    /**
-     * 验证Jwt
-     */
-//    public boolean validJwt(String jwt, String audience) {
-//        DecodedJWT decodedJWT = this.decodeJwt(jwt);
-//        if (decodedJWT == null) {
-//            return false;
-//        }
-//
-//        // 验证接收人
-//        return Objects.equals(audience, decodedJWT.getAudience().get(0));
-//    }
-
-    /**
      * 解码Jwt
      */
     public DecodedJWT decodeJwt(String jwt, String subject, String terminal) {

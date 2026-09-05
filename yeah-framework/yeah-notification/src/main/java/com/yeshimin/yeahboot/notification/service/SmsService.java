@@ -11,6 +11,7 @@ import com.aliyun.teaopenapi.models.Config;
 import com.yeshimin.yeahboot.common.common.properties.NotificationAliyunSmsProperties;
 import com.yeshimin.yeahboot.notification.repository.NotifSmsApiLogRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +23,7 @@ import java.util.Map;
  * https://help.aliyun.com/zh/sms/getting-started/use-sms-api?spm=a2c4g.11186623.help-menu-44282.d_1_2.180e3d13hr5Rn6#9661beebe3r58
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SmsService {
 
@@ -37,9 +39,8 @@ public class SmsService {
     }
 
     public SendSmsResponse sendSms(String smsCode, String... numbers) {
-        Map<String, String> templateParam = new HashMap<String, String>() {{
-            put("code", smsCode);
-        }};
+        Map<String, String> templateParam = new HashMap<>();
+        templateParam.put("code", smsCode);
         return this.sendSms(properties.getTemplateCode(), templateParam, numbers);
     }
 
@@ -57,7 +58,7 @@ public class SmsService {
             notifSmsApiLogRepo.createOne(JSON.toJSONString(request), JSON.toJSONString(response));
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("短信发送失败", e);
         }
         notifSmsApiLogRepo.createOne(JSON.toJSONString(request), null);
         return null;
@@ -83,7 +84,7 @@ public class SmsService {
             notifSmsApiLogRepo.createOne(JSON.toJSONString(request), JSON.toJSONString(response));
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("短信发送结果查询失败", e);
         }
         notifSmsApiLogRepo.createOne(JSON.toJSONString(request), null);
         return null;

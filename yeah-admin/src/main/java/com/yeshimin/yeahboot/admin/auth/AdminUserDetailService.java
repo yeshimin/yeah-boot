@@ -8,10 +8,8 @@ import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.upms.domain.vo.UserRolesAndResourcesVo;
 import com.yeshimin.yeahboot.upms.service.SysUserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminUserDetailService implements UserDetailService {

@@ -27,7 +27,7 @@ public enum DataStatusEnum implements IValueEnum {
     }
 
     public static DataStatusEnum of(String value) {
-        for (DataStatusEnum e : DataStatusEnum.values()) {
+        for (DataStatusEnum e : values()) {
             if (e.getValue().equals(value)) {
                 return e;
             }

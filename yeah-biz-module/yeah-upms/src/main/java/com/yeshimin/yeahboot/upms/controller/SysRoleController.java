@@ -14,7 +14,6 @@ import com.yeshimin.yeahboot.upms.domain.vo.SysRoleVo;
 import com.yeshimin.yeahboot.data.mapper.SysRoleMapper;
 import com.yeshimin.yeahboot.data.repository.SysRoleRepo;
 import com.yeshimin.yeahboot.upms.service.SysRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +27,11 @@ import java.util.List;
 @RequestMapping("/admin/sysRole")
 public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEntity, SysRoleRepo> {
 
-    @Autowired
-    private SysRoleService sysRoleService;
+    private final SysRoleService sysRoleService;
 
-    public SysRoleController(SysRoleRepo sysRoleRepo) {
-        // 由于lombok方案无法实现构造方法中调用super，只能显式调用
+    public SysRoleController(SysRoleRepo sysRoleRepo, SysRoleService sysRoleService) {
         super(sysRoleRepo);
+        this.sysRoleService = sysRoleService;
         setModule("admin:sysRole")
                 .disableCreate()
                 .disableDetail()

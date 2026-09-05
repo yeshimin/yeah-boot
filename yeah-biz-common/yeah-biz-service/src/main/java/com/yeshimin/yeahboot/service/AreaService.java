@@ -5,7 +5,6 @@ import com.yeshimin.yeahboot.data.domain.entity.*;
 import com.yeshimin.yeahboot.data.domain.vo.AreaVo;
 import com.yeshimin.yeahboot.data.repository.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AreaService {
@@ -37,7 +35,8 @@ public class AreaService {
     public List<AreaVo> queryCity(String provinceCode) {
         return areaCityRepo.lambdaQuery()
                 .eq(AreaCityEntity::getParentCode, provinceCode)
-                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode, AreaCityEntity::getName, BaseEntity::getId)
+                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode,
+                        AreaCityEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
@@ -56,7 +55,8 @@ public class AreaService {
     public List<AreaVo> queryDistrict(String cityCode) {
         return areaDistrictRepo.lambdaQuery()
                 .eq(AreaDistrictEntity::getParentCode, cityCode)
-                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode, AreaDistrictEntity::getName, BaseEntity::getId)
+                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode,
+                        AreaDistrictEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
@@ -164,7 +164,8 @@ public class AreaService {
             return list;
         }
         return areaVillageRepo.lambdaQuery()
-                .select(AreaVillageEntity::getParentCode, AreaVillageEntity::getCode, AreaVillageEntity::getName, BaseEntity::getId)
+                .select(AreaVillageEntity::getParentCode, AreaVillageEntity::getCode,
+                        AreaVillageEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
@@ -182,7 +183,8 @@ public class AreaService {
             return list;
         }
         return areaStreetRepo.lambdaQuery()
-                .select(AreaStreetEntity::getParentCode, AreaStreetEntity::getCode, AreaStreetEntity::getName, BaseEntity::getId)
+                .select(AreaStreetEntity::getParentCode, AreaStreetEntity::getCode,
+                        AreaStreetEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
@@ -200,7 +202,8 @@ public class AreaService {
             return list;
         }
         return areaCityRepo.lambdaQuery()
-                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode, AreaCityEntity::getName, BaseEntity::getId)
+                .select(AreaCityEntity::getParentCode, AreaCityEntity::getCode,
+                        AreaCityEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();
@@ -218,7 +221,8 @@ public class AreaService {
             return list;
         }
         return areaDistrictRepo.lambdaQuery()
-                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode, AreaDistrictEntity::getName, BaseEntity::getId)
+                .select(AreaDistrictEntity::getParentCode, AreaDistrictEntity::getCode,
+                        AreaDistrictEntity::getName, BaseEntity::getId)
                 .list()
                 .stream().map(e -> {
                     AreaVo vo = new AreaVo();

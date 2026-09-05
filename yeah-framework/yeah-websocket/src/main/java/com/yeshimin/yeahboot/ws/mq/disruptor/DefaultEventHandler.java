@@ -2,16 +2,15 @@ package com.yeshimin.yeahboot.ws.mq.disruptor;
 
 import com.lmax.disruptor.EventHandler;
 import com.yeshimin.yeahboot.ws.mq.TopicConsumer;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
-@Slf4j
 public class DefaultEventHandler implements EventHandler<DefaultEvent> {
 
-    private TopicConsumer topicConsumer;
+    private final TopicConsumer topicConsumer;
 
     public DefaultEventHandler() {
+        this(null);
     }
 
     public DefaultEventHandler(TopicConsumer topicConsumer) {

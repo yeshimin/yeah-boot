@@ -17,7 +17,6 @@ import java.util.List;
 public class DisruptorMqService implements MqService {
 
     private DefaultEventProducer producer;
-//    private DataBuffer buffer;
 
     @Autowired
     private List<TopicConsumer> consumers;
@@ -37,14 +36,11 @@ public class DisruptorMqService implements MqService {
 
         RingBuffer<DefaultEvent> ringBuffer = disruptor.getRingBuffer();
         producer = new DefaultEventProducer(ringBuffer);
-//        buffer = new DataBuffer();
     }
 
     @Override
     public void publish(String topic, String message, SessionKey sk) {
         assert topic != null && message != null && sk != null;
-//        String data = topic + ":" + message + ":" + key;
-//        buffer.putString(data);
         DefaultEvent event = new DefaultEvent();
         event.setTopic(topic);
         event.setData(message);

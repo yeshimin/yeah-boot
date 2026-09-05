@@ -23,7 +23,7 @@ public enum AuthSubjectEnum implements IValueEnum {
     }
 
     public static AuthSubjectEnum of(String value) {
-        for (AuthSubjectEnum e : AuthSubjectEnum.values()) {
+        for (AuthSubjectEnum e : values()) {
             if (e.getValue().equals(value)) {
                 return e;
             }

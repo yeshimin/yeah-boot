@@ -15,13 +15,11 @@ import com.yeshimin.yeahboot.upms.domain.dto.LoginDto;
 import com.yeshimin.yeahboot.upms.domain.vo.AuthenticateVo;
 import com.yeshimin.yeahboot.upms.domain.vo.LoginVo;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
  * 鉴权服务
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminAuthService {

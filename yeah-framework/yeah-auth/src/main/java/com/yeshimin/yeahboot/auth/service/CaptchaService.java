@@ -1,7 +1,9 @@
 package com.yeshimin.yeahboot.auth.service;
 
 import cn.hutool.core.util.StrUtil;
-import com.wf.captcha.*;
+import com.wf.captcha.ArithmeticCaptcha;
+import com.wf.captcha.GifCaptcha;
+import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import com.yeshimin.yeahboot.auth.domain.vo.CaptchaVo;
 import com.yeshimin.yeahboot.common.common.consts.CommonConsts;
@@ -30,9 +32,9 @@ public class CaptchaService {
      * 获取PNG验证码
      */
     @SneakyThrows
-    public Captcha getPngCaptcha() {
+    private Captcha getPngCaptcha() {
         Captcha captcha = new SpecCaptcha(130, 48);
-        captcha.setCharType(this.randomChatType());
+        captcha.setCharType(this.randomCharType());
         captcha.setFont(this.randomFont());
         return captcha;
     }
@@ -41,31 +43,9 @@ public class CaptchaService {
      * 获取GIF验证码
      */
     @SneakyThrows
-    public Captcha getGifCaptcha() {
+    private Captcha getGifCaptcha() {
         Captcha captcha = new GifCaptcha(130, 48);
-        captcha.setCharType(this.randomChatType());
-        captcha.setFont(this.randomFont());
-        return captcha;
-    }
-
-    /**
-     * 获取中文验证码
-     * 没装字体，暂时不开放
-     */
-    @SneakyThrows
-    private Captcha getChineseCaptcha() {
-        ChineseCaptcha captcha = new ChineseCaptcha(130, 48);
-        captcha.setFont(this.randomFont());
-        return captcha;
-    }
-
-    /**
-     * 获取中文GIF验证码
-     * 没装字体，暂时不开放
-     */
-    @SneakyThrows
-    private Captcha getChineseGifCaptcha() {
-        ChineseGifCaptcha captcha = new ChineseGifCaptcha(130, 48);
+        captcha.setCharType(this.randomCharType());
         captcha.setFont(this.randomFont());
         return captcha;
     }
@@ -74,10 +54,9 @@ public class CaptchaService {
      * 获取算术验证码
      */
     @SneakyThrows
-    public Captcha getArithmeticCaptcha() {
+    private Captcha getArithmeticCaptcha() {
         ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 48);
         captcha.setFont(this.randomFont());
-        log.debug("arithmeticString: {}", captcha.getArithmeticString());
         return captcha;
     }
 
@@ -86,7 +65,7 @@ public class CaptchaService {
      */
     public Captcha getRandomCaptcha() {
         int random = this.random(1, 3);
-        log.info("随机验证码类型: {}", random);
+        log.debug("随机验证码类型: {}", random);
 
         switch (random) {
             case 1:
@@ -106,8 +85,6 @@ public class CaptchaService {
         Captcha captcha = this.getRandomCaptcha();
         String verCode = captcha.text().toLowerCase();
         String key = UUID.randomUUID().toString();
-        log.debug("verCode: {}, key: {}", verCode, key);
-
         String cacheKey = String.format(CommonConsts.CAPTCHA_KEY, key);
         redisTemplate.opsForValue().set(cacheKey, verCode, 30, TimeUnit.SECONDS);
 
@@ -121,8 +98,6 @@ public class CaptchaService {
      * 检查验证码
      */
     public void checkCaptcha(String key, String verCode) {
-        log.debug("checkCaptcha...key: {}, verCode: {}", key, verCode);
-
         if (StrUtil.isBlank(key) || StrUtil.isBlank(verCode)) {
             log.error("验证码key或验证码不能为空");
             throw new RuntimeException("验证码key或验证码不能为空");
@@ -130,7 +105,6 @@ public class CaptchaService {
 
         String cacheKey = String.format(CommonConsts.CAPTCHA_KEY, key);
         String cacheVerCode = redisTemplate.opsForValue().get(cacheKey);
-        log.debug("cacheKey: {}, cacheVerCode: {}", cacheKey, cacheVerCode);
         if (StrUtil.isBlank(cacheVerCode)) {
             log.error("验证码已失效");
             throw new RuntimeException("验证码已失效");
@@ -150,7 +124,7 @@ public class CaptchaService {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
 
-    private int randomChatType() {
+    private int randomCharType() {
         return random(Captcha.TYPE_DEFAULT, Captcha.TYPE_NUM_AND_UPPER);
     }
 

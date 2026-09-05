@@ -127,13 +127,12 @@ public class QueryHelper<T> {
 
                 // 获取查询类型
                 QueryField.Type type = queryField.value() == QueryField.Type.DEFAULT ?
-                        (queryField.type() == QueryField.Type.DEFAULT ? (QueryField.Type.EQ) : (queryField.type())) :
+                        (queryField.type() == QueryField.Type.DEFAULT ? QueryField.Type.EQ : queryField.type()) :
                         queryField.value();
 
                 listCondition.add(new Condition(field.getName(), type, value));
             } catch (IllegalAccessException e) {
-                log.error("{}", e.getMessage());
-                e.printStackTrace();
+                log.error("读取查询字段失败: {}", field.getName(), e);
             } finally {
                 field.setAccessible(isAccessible);
             }

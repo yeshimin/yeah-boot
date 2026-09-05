@@ -86,20 +86,6 @@ public class StorageManager {
         return entity;
     }
 
-    /**
-     * 暂时用不到
-     */
-    private SysStorageEntity put(@Nullable String bucketName, @Nullable String path, byte[] fileBytes,
-                                 String fileOriginName, @Nullable StorageTypeEnum storageType, boolean isPublic) {
-        this.checkEnabled();
-        SysStorageEntity entity =
-                this.getProvider(storageType).put(bucketName, path, fileBytes, fileOriginName, isPublic);
-        entity.setIsPublic(isPublic);
-        boolean r = entity.insert();
-        log.info("StorageManager.put.result: {}", r);
-        return entity;
-    }
-
     public StorageGetResult get(String fileKey) {
         this.checkEnabled();
         SysStorageEntity sysStorage = sysStorageRepo.getOneByFileKey(fileKey);

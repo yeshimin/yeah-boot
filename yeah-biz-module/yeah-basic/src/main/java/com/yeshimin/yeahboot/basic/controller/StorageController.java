@@ -75,14 +75,6 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
         return storageService.download(fileKey, false);
     }
 
-//    /**
-//     * 公开下载
-//     */
-//    @GetMapping("/public")
-//    public ResponseEntity<InputStreamResource> publicDownload(@RequestParam("fileKey") String fileKey) {
-//        return storageService.download(fileKey, true);
-//    }
-
     /**
      * 删除文件
      */

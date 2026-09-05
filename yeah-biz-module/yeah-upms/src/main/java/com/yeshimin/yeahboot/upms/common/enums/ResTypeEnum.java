@@ -25,7 +25,7 @@ public enum ResTypeEnum implements IValueEnum {
     }
 
     public static ResTypeEnum of(String value) {
-        for (ResTypeEnum e : ResTypeEnum.values()) {
+        for (ResTypeEnum e : values()) {
             if (e.getValue().equals(value)) {
                 return e;
             }

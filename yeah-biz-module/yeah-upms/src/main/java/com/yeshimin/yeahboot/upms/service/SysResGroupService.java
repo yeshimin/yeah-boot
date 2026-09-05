@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.yeshimin.yeahboot.common.common.consts.CommonConsts;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
-import com.yeshimin.yeahboot.data.domain.entity.SysResEntity;
 import com.yeshimin.yeahboot.data.domain.entity.SysResGroupEntity;
 import com.yeshimin.yeahboot.data.repository.SysResGroupRepo;
 import com.yeshimin.yeahboot.data.repository.SysResRepo;
@@ -97,9 +96,9 @@ public class SysResGroupService {
             if (Objects.equals(dto.getParentId(), dto.getId())) {
                 throw new BaseException("父节点不能是自己");
             }
-            SysResEntity parent = sysResRepo.findOneById(dto.getParentId());
+            SysResGroupEntity parent = sysResGroupRepo.findOneById(dto.getParentId());
             if (parent == null) {
-                throw new BaseException("父节点未找到");
+                throw new BaseException("父分组未找到");
             }
             // 检查：不能挂载到子节点
             if (isParentInOwnSubTree(dto.getParentId(), dto.getId())) {
@@ -113,7 +112,7 @@ public class SysResGroupService {
         boolean nameChanged = StrUtil.isNotBlank(dto.getName()) && !Objects.equals(dto.getName(), entity.getName());
         if (parentChanged || nameChanged) {
             if (sysResRepo.countByParentIdAndName(parentId, name) > 0) {
-                throw new BaseException("同一个父节点下已存在相同名称");
+                throw new BaseException("同一个父分组下已存在相同名称");
             }
         }
 

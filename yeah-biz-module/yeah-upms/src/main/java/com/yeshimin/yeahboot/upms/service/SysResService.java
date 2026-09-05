@@ -112,7 +112,7 @@ public class SysResService {
                 .map(this::toTreeNode)
                 .collect(Collectors.toList());
 
-        // if query scene, return list all
+        // 搜索场景直接返回符合条件的平铺列表
         if (dto.isQuery()) {
             return listAllVo;
         }
