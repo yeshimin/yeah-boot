@@ -11,17 +11,11 @@
 
     <artifactId>yeah-biz-service</artifactId>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
-        <!-- Spring Boot Web -->
+        <!-- common core module -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-common-core</artifactId>
         </dependency>
 
         <!-- biz data module -->

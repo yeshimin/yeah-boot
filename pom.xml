@@ -28,7 +28,6 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring-boot.version>2.7.18</spring-boot.version>
         <mybatis-plus.version>3.5.10</mybatis-plus.version>
         <jwt.version>4.5.0</jwt.version>
         <hutool.version>5.8.36</hutool.version>
@@ -38,24 +37,16 @@
         <sqids.version>0.1.0</sqids.version>
         <okhttp3.version>4.10.0</okhttp3.version>
         <minio.version>7.0.2</minio.version>
-        <qiniu.version>[7.19.0, 7.19.99]</qiniu.version>
+        <qiniu.version>7.19.0</qiniu.version>
         <springdoc.version>1.8.0</springdoc.version>
         <dysmsapi.version>4.1.0</dysmsapi.version>
-        <dyvmsapi.version>3.2.2</dyvmsapi.version>
         <disruptor.version>3.4.4</disruptor.version>
         <easyexcel.version>4.0.3</easyexcel.version>
+        <commons-io.version>2.16.1</commons-io.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Boot Dependencies -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- MyBatis Plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -63,12 +54,6 @@
                 <version>${mybatis-plus.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <!-- MyBatis Plus Generator -->
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-generator</artifactId>
-                <version>${mybatis-plus.version}</version>
             </dependency>
             <!-- Jwt -->
             <dependency>
@@ -90,14 +75,15 @@
                 <version>${easyexcel.version}</version>
             </dependency>
 
-            <!-- ================================================================================ -->
-            <!-- admin (sub)module(s) -->
+            <!-- Commons IO -->
             <dependency>
-                <groupId>com.yeshimin.yeahboot</groupId>
-                <artifactId>yeah-biz-module</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
-            <!-- common module -->
+
+            <!-- ================================================================================ -->
+            <!-- common core module -->
             <dependency>
                 <groupId>com.yeshimin.yeahboot</groupId>
                 <artifactId>yeah-common-core</artifactId>
@@ -254,13 +240,6 @@
                 <version>${dysmsapi.version}</version>
             </dependency>
 
-            <!-- 阿里云语音服务sdk -->
-            <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>dyvmsapi20170525</artifactId>
-                <version>${dyvmsapi.version}</version>
-            </dependency>
-
             <!-- Disruptor 内存消息队列 -->
             <dependency>
                 <groupId>com.lmax</groupId>
@@ -269,19 +248,5 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <plugins>
-            <!-- Maven Compiler Plugin for Java 8 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

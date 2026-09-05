@@ -12,7 +12,7 @@
     <artifactId>yeah-basic</artifactId>
 
     <dependencies>
-        <!-- common module -->
+        <!-- common core module -->
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>
             <artifactId>yeah-common-core</artifactId>
@@ -34,6 +34,12 @@
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>
             <artifactId>yeah-biz-service</artifactId>
+        </dependency>
+
+        <!-- biz data module -->
+        <dependency>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-biz-data</artifactId>
         </dependency>
     </dependencies>
 

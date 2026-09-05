@@ -12,7 +12,7 @@
     <artifactId>yeah-generator</artifactId>
 
     <dependencies>
-        <!-- common module -->
+        <!-- common core module -->
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>
             <artifactId>yeah-common-core</artifactId>

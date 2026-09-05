@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.yaml.snakeyaml.constructor.BaseConstructor;
 
 /**
  * 存储管理
  */
 @RestController
 @RequestMapping("/public/storage")
-public class PublicStorageController extends BaseConstructor {
+public class PublicStorageController {
 
     @Autowired
     private PublicStorageService storageService;

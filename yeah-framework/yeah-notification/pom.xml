@@ -11,17 +11,11 @@
 
     <artifactId>yeah-notification</artifactId>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
-        <!-- common data module -->
+        <!-- common core module -->
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>
-            <artifactId>yeah-common-data</artifactId>
+            <artifactId>yeah-common-core</artifactId>
         </dependency>
 
         <!-- 阿里云短信sdk -->
@@ -29,12 +23,6 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dysmsapi20170525</artifactId>
-        </dependency>
-
-        <!-- 阿里云语音服务sdk -->
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>dyvmsapi20170525</artifactId>
         </dependency>
     </dependencies>
 
