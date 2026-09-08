@@ -7,6 +7,7 @@ import com.yeshimin.yeahboot.common.service.CacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,6 +18,16 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TokenService {
+
+    /**
+     * 删除终端下的Token索引；如果该终端已经没有Token，同时删除用户主体下的终端索引
+     */
+    private static final String DELETE_TOKEN_INFO_LUA =
+            "redis.call('HDEL', KEYS[1], ARGV[1]); " +
+                    "if redis.call('HLEN', KEYS[1]) == 0 then " +
+                    "redis.call('HDEL', KEYS[2], ARGV[2]); " +
+                    "end; " +
+                    "return 1;";
 
     private final JwtService jwtService;
     private final CacheService cacheService;
@@ -58,12 +69,17 @@ public class TokenService {
      * 删除缓存的token
      */
     public void deleteToken(String subject, String userId, String terminal, Long iatMs) {
-        // 删除token
-        cacheService.delete(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN, subject, userId, terminal, iatMs));
-        // 删除terminal下token信息
-        cacheService.deleteHashFields(
-                String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subject, userId, terminal),
-                String.valueOf(iatMs));
+        String tokenKey = String.format(CacheKeyConsts.USER_TERMINAL_TOKEN, subject, userId, terminal, iatMs);
+        String tokenInfoKey = String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subject, userId, terminal);
+        String terminalInfoKey = String.format(CacheKeyConsts.USER_SUBJECT_TERMINAL_INFO, subject, userId);
+
+        // 删除服务端保存的Token
+        cacheService.delete(tokenKey);
+        // 原子删除Token索引，并在当前终端已经没有Token时同步删除空终端索引
+        cacheService.executeLua(
+                DELETE_TOKEN_INFO_LUA,
+                Arrays.asList(tokenInfoKey, terminalInfoKey),
+                Arrays.asList(String.valueOf(iatMs), terminal));
     }
 
     /**

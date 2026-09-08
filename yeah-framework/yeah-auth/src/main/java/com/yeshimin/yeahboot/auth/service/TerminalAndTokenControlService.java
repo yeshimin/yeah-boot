@@ -70,7 +70,8 @@ public class TerminalAndTokenControlService {
         Map<String, String> mapTotalTerminalTokenInfoExpired = new HashMap<>();
         for (Map.Entry<String, String> entry : mapTerminalInfo.entrySet()) {
             // 查询对应终端的token信息
-            Map<String, String> mapTerminalTokenInfo = tokenService.getTerminalTokenInfo(subValue, userId, entry.getKey());
+            Map<String, String> mapTerminalTokenInfo =
+                    tokenService.getTerminalTokenInfo(subValue, userId, entry.getKey());
             mapTotalTerminalTokenInfo.put(entry.getKey(), mapTerminalTokenInfo);
         }
         // 查询当前终端的token信息
@@ -101,7 +102,8 @@ public class TerminalAndTokenControlService {
         // 大于0，需要检查和控制超限情况
         if (subject.getMaxOnlineTerminalCount() > 0) {
             // 检查当前在线终端数是否达到限制
-            int occurTerminalCount = mapTerminalInfoValid.size() + (mapTerminalInfoValid.containsKey(termValue) ? 0 : 1);
+            int occurTerminalCount =
+                    mapTerminalInfoValid.size() + (mapTerminalInfoValid.containsKey(termValue) ? 0 : 1);
             // 超限情况
             if (occurTerminalCount > subject.getMaxOnlineTerminalCount()) {
                 // 要清除的终端数
@@ -241,14 +243,17 @@ public class TerminalAndTokenControlService {
                 delKeys.add(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subValue, userId, term));
                 Optional.ofNullable(mapTotalTerminalTokenInfo.get(term)).ifPresent(terminalTokenInfo -> {
                     terminalTokenInfo.keySet().forEach(timestamp -> {
-                        delFields.computeIfAbsent(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subValue, userId, term),
+                        delFields.computeIfAbsent(
+                                String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subValue, userId, term),
                                 k -> new HashSet<>()).add(timestamp);
-                        delKeys.add(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN, subValue, userId, term, timestamp));
+                        delKeys.add(String.format(
+                                CacheKeyConsts.USER_TERMINAL_TOKEN, subValue, userId, term, timestamp));
                     });
                 });
             });
             mapNeedDeleteTokenInfo.forEach((term, timestampSet) -> {
-                delFields.computeIfAbsent(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subValue, userId, term),
+                delFields.computeIfAbsent(
+                        String.format(CacheKeyConsts.USER_TERMINAL_TOKEN_INFO, subValue, userId, term),
                         k -> new HashSet<>()).addAll(timestampSet);
                 timestampSet.forEach(timestamp -> {
                     delKeys.add(String.format(CacheKeyConsts.USER_TERMINAL_TOKEN, subValue, userId, term, timestamp));
@@ -260,9 +265,12 @@ public class TerminalAndTokenControlService {
                 cacheService.deleteHashFields(cacheKey, fields.toArray(new Object[0]));
             });
 
-            tokenService.setSubjectTerminalInfo(subValue, userId, termValue, jwtPayloadVo.getIatMs(), jwtPayloadVo.getExpMs());
-            tokenService.setTerminalTokenInfo(subValue, userId, termValue, jwtPayloadVo.getIatMs(), jwtPayloadVo.getExpMs());
+            // 先写Token及终端下的Token索引，最后写用户主体下的终端索引，避免并发退出误删新登录终端
+            tokenService.setTerminalTokenInfo(
+                    subValue, userId, termValue, jwtPayloadVo.getIatMs(), jwtPayloadVo.getExpMs());
             tokenService.cacheToken(subValue, userId, termValue, token, timestampMs);
+            tokenService.setSubjectTerminalInfo(
+                    subValue, userId, termValue, jwtPayloadVo.getIatMs(), jwtPayloadVo.getExpMs());
             return token;
         }
     }
