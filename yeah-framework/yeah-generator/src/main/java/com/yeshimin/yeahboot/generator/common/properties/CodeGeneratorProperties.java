@@ -16,10 +16,9 @@ public class CodeGeneratorProperties {
 
     @PostConstruct
     public void init() {
-        log.info("init [yeah-boot.code-generator] properties..." +
-                        "url: {}, username: {}, author: {}, pack: {}, module: {}, " +
-                        "tablePrefix: {}, baseEntityFields: {}",
-                url, username, author, pack, module, tablePrefix, baseEntityFields);
+        log.info("init [yeah-boot.code-generator] properties...url: {}, username: {}, password: {}, author: {}, "
+                        + "pack: {}, module: {}, tablePrefix: {}, baseEntityFields: {}",
+                "******", "******", "******", author, pack, module, tablePrefix, baseEntityFields);
     }
 
     private String url;

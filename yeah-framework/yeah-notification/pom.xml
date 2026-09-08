@@ -17,6 +17,11 @@
             <groupId>com.yeshimin.yeahboot</groupId>
             <artifactId>yeah-common-core</artifactId>
         </dependency>
+        <!-- common data module -->
+        <dependency>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-common-data</artifactId>
+        </dependency>
 
         <!-- 阿里云短信sdk -->
         <!-- https://mvnrepository.com/artifact/com.aliyun/dysmsapi20170525 -->

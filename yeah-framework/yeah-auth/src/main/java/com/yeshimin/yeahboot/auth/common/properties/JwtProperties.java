@@ -17,7 +17,7 @@ public class JwtProperties {
 
     @PostConstruct
     private void init() {
-        log.info("init [auth.token.jwt] properties...secret: {}, expiredSeconds: {}, defaultLeeway: {}",
+        log.info("init [auth.token.jwt] properties...secret: {}, expireSeconds: {}, defaultLeeway: {}",
                 "******", expireSeconds, defaultLeeway);
     }
 

@@ -63,14 +63,6 @@ mybatis-plus:
 
 # auth相关
 auth:
-  # 管理端登录相关配置
-  admin-login:
-    # 登录失败次数统计窗口，单位：秒
-    failure-window-seconds: 600
-    # 达到该失败次数后临时锁定
-    max-failure-count: 5
-    # 临时锁定时长，单位：秒
-    lock-seconds: 600
   token:
     # 全局jwt配置（subject中可覆盖）
     jwt:
@@ -123,15 +115,10 @@ auth:
         max-online-terminal-count: -1
 
 yeah-boot:
-  # 是否开启验证码校验
-  captcha-enabled: true
   # 是否为安全模式（场景：跳过@PreAuthorize @pms.hasPermission权限校验，方便权限配置或其他场景；一般为false，不需要动）
   safe-mode: false
   # 超级管理员账号，该账号可以跳过权限校验
   super-admin: ''
-  sms-code-length: 6
-  # 短信验证码过期时间（秒）
-  sms-code-exp-seconds: 300
   # ID编号生成器
   id-generator:
     alphabet: GQT0FNR3taz1vDVEjsSJ2biZmLB8qk6OCMndohlKf4IAw7xr9eYgXWPcuHpU5y
@@ -197,8 +184,6 @@ yeah-boot:
       sms:
         access-key-id: OVERWRITE_ME
         access-key-secret: OVERWRITE_ME
-        template-code: OVERWRITE_ME
-        sign-name: OVERWRITE_ME
   # Websocket相关
   websocket:
     heartbeat:
@@ -208,9 +193,3 @@ yeah-boot:
       interval: 30
       # 心跳检测超时时间（秒）
       timeout: 90
-  # 系统用户导入/导出相关
-  sys-user-excel:
-    max-import-file-size-mb: 5
-    max-import-rows: 1000
-    max-export-rows: 10000
-    max-error-messages: 20

@@ -17,7 +17,9 @@ public class StorageProperties {
 
     @PostConstruct
     public void init() {
-        log.info("init [yeah-boot.storage] properties... enabled: {}, impl: {}", enabled, impl);
+        log.info("init [yeah-boot.storage] properties...enabled: {}, impl: {}, biz: {}, local: {}, "
+                        + "qiniu: {}, minio: {}",
+                enabled, "******", "******", "******", "******", "******");
 
         if (!BooleanUtil.isTrue(enabled)) {
             log.info("[yeah-boot.storage] is disabled");

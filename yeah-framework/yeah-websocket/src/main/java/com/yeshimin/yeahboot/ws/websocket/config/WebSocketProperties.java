@@ -15,7 +15,11 @@ public class WebSocketProperties {
 
     @PostConstruct
     private void init() {
-        log.info("init [yeah-boot.websocket] properties...heartbeat: {}", heartbeat);
+        log.info("init [yeah-boot.websocket] properties...heartbeatEnabled: {}, heartbeatInterval: {}, "
+                        + "heartbeatTimeout: {}",
+                heartbeat == null ? null : heartbeat.getEnabled(),
+                heartbeat == null ? null : heartbeat.getInterval(),
+                heartbeat == null ? null : heartbeat.getTimeout());
     }
 
     private Heartbeat heartbeat;

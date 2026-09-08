@@ -5,12 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import com.yeshimin.yeahboot.app.domain.mq.payload.SmsMqPayload;
 import com.yeshimin.yeahboot.auth.service.TerminalAndTokenControlService;
 import com.yeshimin.yeahboot.common.common.consts.CommonConsts;
+import com.yeshimin.yeahboot.common.common.enums.SysConfigEnum;
 import com.yeshimin.yeahboot.common.common.enums.AuthSubjectEnum;
 import com.yeshimin.yeahboot.common.common.enums.AuthTerminalEnum;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
-import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
 import com.yeshimin.yeahboot.common.service.CacheService;
+import com.yeshimin.yeahboot.data.service.DynamicConfigService;
 import com.yeshimin.yeahboot.common.service.IdService;
 import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.common.consts.BizConsts;
@@ -18,7 +19,6 @@ import com.yeshimin.yeahboot.data.domain.entity.AppUserEntity;
 import com.yeshimin.yeahboot.data.repository.AppUserRepo;
 import com.yeshimin.yeahboot.mq.MqMessage;
 import com.yeshimin.yeahboot.mq.MqPublisher;
-import com.yeshimin.yeahboot.notification.service.SmsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,10 +39,9 @@ public class AppAuthService {
     private final PasswordService passwordService;
     private final TerminalAndTokenControlService controlService;
 
-    private final YeahBootProperties yeahBootProperties;
+    private final DynamicConfigService dynamicConfigService;
     private final CacheService cacheService;
     private final IdService idService;
-    private final SmsService smsService;
 
     private final MqPublisher mqPublisher;
 
@@ -99,12 +98,14 @@ public class AppAuthService {
      */
     public void sendSmsCode(SendSmsCodeDto dto) {
         // 生成短信验证码
-        String smsCode = RandomUtil.randomNumbers(yeahBootProperties.getSmsCodeLength());
+        Integer smsCodeLength = dynamicConfigService.getInteger(SysConfigEnum.SMS_CODE_LENGTH);
+        Integer smsCodeExpSeconds = dynamicConfigService.getInteger(SysConfigEnum.SMS_CODE_EXP_SECONDS);
+        String smsCode = RandomUtil.randomNumbers(smsCodeLength);
         // 生成缓存key
         String key = String.format(CommonConsts.APP_SMS_CODE_KEY, dto.getMobile());
         log.debug("smsCode: {}, key: {}", smsCode, key);
         // 执行缓存
-        cacheService.set(key, smsCode, yeahBootProperties.getSmsCodeExpSeconds());
+        cacheService.set(key, smsCode, smsCodeExpSeconds);
         // 发送短信（异步）
         this.asyncSendSms(smsCode, dto.getMobile());
     }

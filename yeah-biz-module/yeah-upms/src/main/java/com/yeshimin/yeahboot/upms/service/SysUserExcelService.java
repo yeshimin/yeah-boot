@@ -13,12 +13,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
 import com.yeshimin.yeahboot.common.common.enums.GenderEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
+import com.yeshimin.yeahboot.common.common.enums.SysConfigEnum;
 import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
+import com.yeshimin.yeahboot.data.service.DynamicConfigService;
 import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.domain.dto.SysUserQueryDto;
 import com.yeshimin.yeahboot.data.domain.entity.SysUserEntity;
 import com.yeshimin.yeahboot.data.repository.SysUserRepo;
-import com.yeshimin.yeahboot.upms.common.properties.SysUserExcelProperties;
 import com.yeshimin.yeahboot.upms.domain.excel.SysUserExportExcelRow;
 import com.yeshimin.yeahboot.upms.domain.excel.SysUserImportExcelRow;
 import com.yeshimin.yeahboot.upms.domain.excel.SysUserImportInstructionExcelRow;
@@ -57,7 +58,7 @@ public class SysUserExcelService {
     private final SysUserRepo sysUserRepo;
     private final PasswordService passwordService;
     private final YeahBootProperties yeahBootProperties;
-    private final SysUserExcelProperties excelProperties;
+    private final DynamicConfigService dynamicConfigService;
 
     /**
      * 生成用户导入模板
@@ -126,7 +127,7 @@ public class SysUserExcelService {
      * 导出用户基础信息，不导出密码、头像和关联数据
      */
     public byte[] exportUsers(SysUserQueryDto dto) {
-        int maxExportRows = excelProperties.getMaxExportRows();
+        int maxExportRows = dynamicConfigService.getInteger(SysConfigEnum.SYS_USER_EXCEL_MAX_EXPORT_ROWS);
         List<SysUserEntity> users = sysUserRepo.query(Page.of(1, (long) maxExportRows + 1), dto).getRecords();
         if (users.size() > maxExportRows) {
             throw new BaseException("单次最多导出" + maxExportRows + "条用户数据，请增加筛选条件后重试");
@@ -148,8 +149,9 @@ public class SysUserExcelService {
         if (file == null || file.isEmpty()) {
             throw new BaseException("请选择用户导入文件");
         }
-        if (file.getSize() > excelProperties.getMaxImportFileSizeMb() * 1024 * 1024) {
-            throw new BaseException("用户导入文件不能超过" + excelProperties.getMaxImportFileSizeMb() + "MB");
+        long maxImportFileSizeMb = dynamicConfigService.getLong(SysConfigEnum.SYS_USER_EXCEL_MAX_IMPORT_FILE_SIZE_MB);
+        if (file.getSize() > maxImportFileSizeMb * 1024 * 1024) {
+            throw new BaseException("用户导入文件不能超过" + maxImportFileSizeMb + "MB");
         }
         String fileName = file.getOriginalFilename();
         if (StrUtil.isBlank(fileName) || !StrUtil.endWithIgnoreCase(fileName, ".xlsx")) {
@@ -158,7 +160,8 @@ public class SysUserExcelService {
     }
 
     private List<SysUserImportExcelRow> readImportRows(MultipartFile file) {
-        ImportListener listener = new ImportListener(excelProperties.getMaxImportRows());
+        int maxImportRows = dynamicConfigService.getInteger(SysConfigEnum.SYS_USER_EXCEL_MAX_IMPORT_ROWS);
+        ImportListener listener = new ImportListener(maxImportRows);
         try (InputStream inputStream = file.getInputStream()) {
             EasyExcel.read(inputStream, SysUserImportExcelRow.class, listener)
                     .autoCloseStream(false)
@@ -200,7 +203,7 @@ public class SysUserExcelService {
 
         if (!errors.isEmpty()) {
             int errorCount = errors.size();
-            int maxErrorMessages = excelProperties.getMaxErrorMessages();
+            int maxErrorMessages = dynamicConfigService.getInteger(SysConfigEnum.SYS_USER_EXCEL_MAX_ERROR_MESSAGES);
             String message = errors.stream().limit(maxErrorMessages).collect(Collectors.joining("；"));
             if (errorCount > maxErrorMessages) {
                 message += "；另有" + (errorCount - maxErrorMessages) + "条错误未展示";

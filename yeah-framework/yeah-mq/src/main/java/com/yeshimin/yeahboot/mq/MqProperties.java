@@ -16,7 +16,9 @@ public class MqProperties {
 
     @PostConstruct
     private void init() {
-        log.info("init [yeah-boot.mq] properties...this: {}", this);
+        log.info("init [yeah-boot.mq] properties...impl: {}, autoAck: {}, defaultGroup: {}, batchSize: {}, "
+                        + "blockTimeout: {}",
+                impl, autoAck, defaultGroup, batchSize, blockTimeout);
     }
 
     // redis | rabbitmq

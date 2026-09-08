@@ -11,4 +11,7 @@ public class CacheKeyConsts {
     public static final String USER_TERMINAL_TOKEN_INFO = "sub:%s:user:%s:token:term:%s";
     // token subject : user : terminal : token timestamp
     public static final String USER_TERMINAL_TOKEN = "sub:%s:user:%s:token:term:%s:%s";
+
+    // 系统参数
+    public static final String SYSTEM_CONFIG = "sys:config";
 }

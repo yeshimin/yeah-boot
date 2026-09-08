@@ -1,6 +1,5 @@
 package com.yeshimin.yeahboot.auth.common.properties;
 
-import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,7 +21,8 @@ public class AuthTokenProperties {
 
     @PostConstruct
     private void init() {
-        log.info("init [auth.token] properties...subjects: {}", JSON.toJSONString(subjects));
+        log.info("init [auth.token] properties...jwt: {}, subjects: {}, subjectCount: {}",
+                "******", "******", subjects == null ? 0 : subjects.size());
 
         for (Subject subject : subjects) {
             // 检查配置是否正确

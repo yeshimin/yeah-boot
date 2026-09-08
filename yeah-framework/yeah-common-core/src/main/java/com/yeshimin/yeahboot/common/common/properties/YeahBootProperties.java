@@ -15,14 +15,8 @@ public class YeahBootProperties {
 
     @PostConstruct
     public void init() {
-        log.info("init [yeah-boot] properties...captchaEnabled: {}, safeMode: {}, superAdmin: {}, smsCodeLength: {}",
-                captchaEnabled, safeMode, superAdmin, smsCodeLength);
+        log.info("init [yeah-boot] properties...safeMode: {}, superAdmin: {}", safeMode, "******");
     }
-
-    /**
-     * 是否开启验证码校验
-     */
-    private Boolean captchaEnabled;
 
     /**
      * 是否安全模式
@@ -33,14 +27,4 @@ public class YeahBootProperties {
      * 超级管理员账号
      */
     private String superAdmin;
-
-    /**
-     * 短信验证码长度
-     */
-    private Integer smsCodeLength;
-
-    /**
-     * 短信过期时间（秒）
-     */
-    private Integer smsCodeExpSeconds;
 }

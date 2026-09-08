@@ -1,14 +1,15 @@
 package com.yeshimin.yeahboot.admin.auth;
 
 import cn.hutool.core.util.BooleanUtil;
+import com.yeshimin.yeahboot.common.common.enums.SysConfigEnum;
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.auth.common.config.security.PublicAccess;
 import com.yeshimin.yeahboot.auth.domain.vo.CaptchaVo;
 import com.yeshimin.yeahboot.auth.service.CaptchaService;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
-import com.yeshimin.yeahboot.common.common.properties.YeahBootProperties;
 import com.yeshimin.yeahboot.common.controller.base.BaseController;
 import com.yeshimin.yeahboot.common.domain.base.R;
+import com.yeshimin.yeahboot.data.service.DynamicConfigService;
 import com.yeshimin.yeahboot.flowcontrol.enums.GroupType;
 import com.yeshimin.yeahboot.flowcontrol.ratelimit.RateLimit;
 import com.yeshimin.yeahboot.upms.domain.dto.LoginDto;
@@ -32,7 +33,7 @@ public class AdminAuthController extends BaseController {
     private final AdminAuthService adminAuthService;
     private final CaptchaService captchaService;
 
-    private final YeahBootProperties yeahBootProperties;
+    private final DynamicConfigService dynamicConfigService;
 
     /**
      * 登录
@@ -43,7 +44,7 @@ public class AdminAuthController extends BaseController {
     @SysLog(value = "登录", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/login")
     public R<LoginVo> login(@Valid @RequestBody LoginDto dto) {
-        if (BooleanUtil.isTrue(yeahBootProperties.getCaptchaEnabled())) {
+        if (BooleanUtil.isTrue(this.isCaptchaEnabled())) {
             captchaService.checkCaptcha(dto.getKey(), dto.getCode());
         }
         return R.ok(adminAuthService.login(dto));
@@ -66,9 +67,13 @@ public class AdminAuthController extends BaseController {
     @PublicAccess
     @GetMapping("/captcha")
     public R<CaptchaVo> captcha() {
-        Boolean captchaEnabled = yeahBootProperties.getCaptchaEnabled();
+        Boolean captchaEnabled = this.isCaptchaEnabled();
         CaptchaVo vo = captchaEnabled ? captchaService.generateCaptcha() : new CaptchaVo();
         vo.setEnabled(captchaEnabled);
         return R.ok(vo);
+    }
+
+    private Boolean isCaptchaEnabled() {
+        return dynamicConfigService.getBoolean(SysConfigEnum.CAPTCHA_ENABLED);
     }
 }

@@ -2,7 +2,9 @@ package com.yeshimin.yeahboot.admin.auth;
 
 import com.yeshimin.yeahboot.common.common.enums.AuthSubjectEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
+import com.yeshimin.yeahboot.common.common.enums.SysConfigEnum;
 import com.yeshimin.yeahboot.common.service.CacheService;
+import com.yeshimin.yeahboot.data.service.DynamicConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,7 @@ public class AdminLoginAttemptService {
                     "return count;";
 
     private final CacheService cacheService;
-    private final AdminLoginProperties adminLoginProperties;
+    private final DynamicConfigService dynamicConfigService;
 
     /**
      * 检查当前登录维度是否处于临时锁定状态
@@ -52,16 +54,19 @@ public class AdminLoginAttemptService {
      * @return 剩余可尝试次数；返回0表示已经进入临时锁定
      */
     public long recordFailure(String username, String terminal) {
-        String failureKey = this.getFailureKey(username, terminal);
+        long failureWindowSeconds = dynamicConfigService.getLong(SysConfigEnum.ADMIN_LOGIN_FAILURE_WINDOW_SECONDS);
+        long maxFailureCount = dynamicConfigService.getLong(SysConfigEnum.ADMIN_LOGIN_MAX_FAILURE_COUNT);
+        long lockSeconds = this.getLockSeconds();
+         String failureKey = this.getFailureKey(username, terminal);
         Long count = cacheService.executeLua(INCREASE_FAILURE_LUA,
                 Collections.singletonList(failureKey),
-                Collections.singletonList(String.valueOf(adminLoginProperties.getFailureWindowSeconds())));
+                Collections.singletonList(String.valueOf(failureWindowSeconds)));
         long failureCount = count == null ? 1 : count;
-        if (failureCount < adminLoginProperties.getMaxFailureCount()) {
-            return adminLoginProperties.getMaxFailureCount() - failureCount;
+        if (failureCount < maxFailureCount) {
+            return maxFailureCount - failureCount;
         }
 
-        cacheService.set(this.getLockKey(username, terminal), "1", adminLoginProperties.getLockSeconds());
+        cacheService.set(this.getLockKey(username, terminal), "1", lockSeconds);
         cacheService.delete(failureKey);
         return 0;
     }
@@ -70,7 +75,7 @@ public class AdminLoginAttemptService {
      * 获取配置的临时锁定时长
      */
     public long getLockSeconds() {
-        return adminLoginProperties.getLockSeconds();
+        return dynamicConfigService.getLong(SysConfigEnum.ADMIN_LOGIN_LOCK_SECONDS);
     }
 
     /**
