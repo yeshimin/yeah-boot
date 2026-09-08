@@ -205,6 +205,8 @@ yeah-boot.storage.impl.qiniu.secret-key=your-qiniu-secret-key
 
 ## Roadmap
 
+完整的待处理、部分完成和暂缓事项见 [项目路线图](./docs/ROADMAP.md)。
+
 - 支持更完善的全局限流模式
 - 补充更完整的配置示例与部署说明
 - 提升模块级测试覆盖率
