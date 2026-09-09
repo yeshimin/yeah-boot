@@ -1,4 +1,4 @@
-﻿-- 资源权限分层管理改造
+-- 资源权限分层管理改造
 -- 执行前请先切换到目标库，例如：USE yeah_boot;
 -- 说明：
 -- 1. sys_res 仍然是最终鉴权资源表。
@@ -45,6 +45,9 @@ SET @ddl := (
 PREPARE stmt FROM @ddl;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+ALTER TABLE sys_res
+    MODIFY COLUMN permission VARCHAR(128) NOT NULL DEFAULT '' COMMENT '权限标识（全局唯一）';
 
 CREATE TABLE IF NOT EXISTS sys_res_group (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
@@ -165,10 +168,10 @@ INSERT INTO sys_res (
     remark
 )
 SELECT @max_time, 0, @now, @operator, @now, @operator, 4, @resource_page_id, 0,
-       '接口分组树', 'admin:sysResGroup:tree', '', '', '', 0, '', '1', 1, 80,
+       '接口分组树', 'api:admin:sysResGroup:tree', '', '', '', 0, '', '1', 1, 80,
        'GET /admin/sysResGroup/tree'
 WHERE NOT EXISTS (
-    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'admin:sysResGroup:tree'
+    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'api:admin:sysResGroup:tree'
 );
 
 INSERT INTO sys_res (
@@ -194,10 +197,10 @@ INSERT INTO sys_res (
     remark
 )
 SELECT @max_time, 0, @now, @operator, @now, @operator, 3, @resource_page_id, 0,
-       '新增接口分组', 'admin:sysResGroup:create', '', '', '', 0, '', '1', 1, 90,
+       '新增接口分组', 'api:admin:sysResGroup:create', '', '', '', 0, '', '1', 1, 90,
        'POST /admin/sysResGroup/create'
 WHERE NOT EXISTS (
-    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'admin:sysResGroup:create'
+    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'api:admin:sysResGroup:create'
 );
 
 INSERT INTO sys_res (
@@ -223,10 +226,10 @@ INSERT INTO sys_res (
     remark
 )
 SELECT @max_time, 0, @now, @operator, @now, @operator, 3, @resource_page_id, 0,
-       '编辑接口分组', 'admin:sysResGroup:update', '', '', '', 0, '', '1', 1, 100,
+       '编辑接口分组', 'api:admin:sysResGroup:update', '', '', '', 0, '', '1', 1, 100,
        'POST /admin/sysResGroup/update'
 WHERE NOT EXISTS (
-    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'admin:sysResGroup:update'
+    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'api:admin:sysResGroup:update'
 );
 
 INSERT INTO sys_res (
@@ -252,10 +255,10 @@ INSERT INTO sys_res (
     remark
 )
 SELECT @max_time, 0, @now, @operator, @now, @operator, 3, @resource_page_id, 0,
-       '删除接口分组', 'admin:sysResGroup:delete', '', '', '', 0, '', '1', 1, 110,
+       '删除接口分组', 'api:admin:sysResGroup:delete', '', '', '', 0, '', '1', 1, 110,
        'POST /admin/sysResGroup/delete'
 WHERE NOT EXISTS (
-    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'admin:sysResGroup:delete'
+    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'api:admin:sysResGroup:delete'
 );
 
 INSERT INTO sys_res (
@@ -281,10 +284,10 @@ INSERT INTO sys_res (
     remark
 )
 SELECT @max_time, 0, @now, @operator, @now, @operator, 4, @resource_page_id, 0,
-       '查询资源挂载接口', 'admin:sysResMount:query', '', '', '', 0, '', '1', 1, 120,
+       '查询资源挂载接口', 'api:admin:sysResMount:query', '', '', '', 0, '', '1', 1, 120,
        'GET /admin/sysResMount/queryByViewResId'
 WHERE NOT EXISTS (
-    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'admin:sysResMount:query'
+    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'api:admin:sysResMount:query'
 );
 
 INSERT INTO sys_res (
@@ -310,10 +313,10 @@ INSERT INTO sys_res (
     remark
 )
 SELECT @max_time, 0, @now, @operator, @now, @operator, 3, @resource_page_id, 0,
-       '保存资源挂载接口', 'admin:sysResMount:save', '', '', '', 0, '', '1', 1, 130,
+       '保存资源挂载接口', 'api:admin:sysResMount:save', '', '', '', 0, '', '1', 1, 130,
        'POST /admin/sysResMount/saveByViewResId'
 WHERE NOT EXISTS (
-    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'admin:sysResMount:save'
+    SELECT 1 FROM sys_res WHERE deleted = 0 AND permission = 'api:admin:sysResMount:save'
 );
 
 -- 授权给 admin 角色，避免新增接口上线后管理员看不到按钮或调用 403。
@@ -342,12 +345,12 @@ FROM sys_role role
 JOIN sys_res res
   ON res.deleted = 0
  AND res.permission IN (
-     'admin:sysResGroup:tree',
-     'admin:sysResGroup:create',
-     'admin:sysResGroup:update',
-     'admin:sysResGroup:delete',
-     'admin:sysResMount:query',
-     'admin:sysResMount:save'
+     'api:admin:sysResGroup:tree',
+     'api:admin:sysResGroup:create',
+     'api:admin:sysResGroup:update',
+     'api:admin:sysResGroup:delete',
+     'api:admin:sysResMount:query',
+     'api:admin:sysResMount:save'
  )
 WHERE role.deleted = 0
   AND role.code = @grant_all_role_code

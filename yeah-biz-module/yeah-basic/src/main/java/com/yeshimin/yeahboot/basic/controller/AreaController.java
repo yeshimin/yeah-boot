@@ -26,7 +26,7 @@ public class AreaController extends BaseController {
     /**
      * tree
      */
-    @PreAuthorize("@pms.hasPermission('admin:area:tree')")
+    @PreAuthorize("@pms.hasPermission('api:admin:area:tree')")
     @GetMapping("/tree")
     public R<List<AreaVo>> tree(
             @RequestParam(value = "maxLevel", required = false, defaultValue = "3") Integer maxLevel) {

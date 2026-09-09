@@ -32,7 +32,7 @@ public class SysRoleController extends CrudController<SysRoleMapper, SysRoleEnti
     public SysRoleController(SysRoleRepo sysRoleRepo, SysRoleService sysRoleService) {
         super(sysRoleRepo);
         this.sysRoleService = sysRoleService;
-        setModule("admin:sysRole")
+        setModule("api:admin:sysRole")
                 .disableCreate()
                 .disableDetail()
                 .disableUpdate()

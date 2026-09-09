@@ -32,7 +32,7 @@ public class SysDictController extends CrudController<SysDictMapper, SysDictEnti
     public SysDictController(SysDictRepo service) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(service);
-        setModule("admin:sysDict")
+        setModule("api:admin:sysDict")
                 .disableCreate()
                 .disableQuery()
                 .disableUpdate()

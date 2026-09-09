@@ -52,7 +52,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     public SysUserController(SysUserRepo sysUserRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysUserRepo);
-        setModule("admin:sysUser")
+        setModule("api:admin:sysUser")
                 .disableCreate()
                 .disableQuery()
                 .disableDetail()
@@ -104,7 +104,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 重置用户密码
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:resetPassword')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':resetPassword')")
     @SysLog(value = "重置用户密码", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/resetPassword")
     public R<Void> resetPassword(@Valid @RequestBody SysUserResetPasswordDto dto) {
@@ -127,7 +127,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 下载用户导入模板
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:importTemplate')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':importTemplate')")
     @GetMapping("/importTemplate")
     public ResponseEntity<byte[]> importTemplate() {
         return this.buildExcelResponse(sysUserExcelService.createImportTemplate(), "用户导入模板.xlsx");
@@ -136,7 +136,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 导入用户
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:import')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':import')")
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<SysUserImportResultVo> importUsers(@RequestParam("file") MultipartFile file) {
         return R.ok(sysUserExcelService.importUsers(file));
@@ -145,7 +145,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
     /**
      * 导出用户
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysUser:export')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':export')")
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportUsers(SysUserQueryDto dto) {
         String fileName = "用户数据_" + DateUtil.format(new Date(), "yyyyMMddHHmmss") + ".xlsx";

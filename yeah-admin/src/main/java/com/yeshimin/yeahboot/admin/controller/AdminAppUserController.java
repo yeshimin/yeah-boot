@@ -16,7 +16,7 @@ public class AdminAppUserController extends CrudController<AppUserMapper, AppUse
 
     public AdminAppUserController(AppUserRepo repo) {
         super(repo);
-        setModule("admin:appUser")
+        setModule("api:admin:appUser")
                 .disableCreate()
                 .disableQuery()
                 .disableDetail()

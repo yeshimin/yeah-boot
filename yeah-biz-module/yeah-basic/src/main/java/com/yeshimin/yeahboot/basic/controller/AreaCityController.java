@@ -22,7 +22,7 @@ public class AreaCityController extends CrudController<AreaCityMapper, AreaCityE
     public AreaCityController(AreaCityRepo areaCityRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(areaCityRepo);
-        super.setModule("admin:areaCity");
+        super.setModule("api:admin:areaCity");
     }
 
     // ================================================================================

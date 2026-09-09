@@ -44,7 +44,7 @@ public class SysConfigController extends CrudController<SysConfigMapper, SysConf
     /**
      * 创建系统参数
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysConfig:create')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
     @SysLog(value = "创建系统参数", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysConfigEntity> create(@Valid @RequestBody SysConfigCreateDto dto) {
@@ -56,7 +56,7 @@ public class SysConfigController extends CrudController<SysConfigMapper, SysConf
     /**
      * 更新系统参数
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysConfig:update')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @SysLog(value = "更新系统参数", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysConfigEntity> update(@Valid @RequestBody SysConfigUpdateDto dto) {
@@ -68,7 +68,7 @@ public class SysConfigController extends CrudController<SysConfigMapper, SysConf
     /**
      * 删除系统参数
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysConfig:delete')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @SysLog(value = "删除系统参数", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
@@ -80,7 +80,7 @@ public class SysConfigController extends CrudController<SysConfigMapper, SysConf
     /**
      * 从数据库重新加载系统参数缓存
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysConfig:refreshCache')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':refreshCache')")
     @SysLog(value = "刷新系统参数缓存", category = SysLogCategoryEnum.DATA)
     @PostMapping("/refreshCache")
     public R<Void> refreshCache() {

@@ -26,7 +26,7 @@ public class SysLogController extends CrudController<SysLogMapper, SysLogEntity,
     public SysLogController(SysLogRepo sysPostRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysPostRepo);
-        setModule("admin:sysLog")
+        setModule("api:admin:sysLog")
                 .disableCreate()
                 .disableDetail()
                 .disableUpdate()
@@ -38,7 +38,7 @@ public class SysLogController extends CrudController<SysLogMapper, SysLogEntity,
     /**
      * 日志详情
      */
-    @PreAuthorize("@pms.hasPermission('api:admin:sysLog:detail')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':detail')")
     @GetMapping("/detail")
     public R<SysLogEntity> detail(@RequestParam Long id) {
         return R.ok(sysLogService.detail(id));

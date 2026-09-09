@@ -22,7 +22,7 @@ public class AreaDistrictController extends CrudController<AreaDistrictMapper, A
     public AreaDistrictController(AreaDistrictRepo areaDistrictRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(areaDistrictRepo);
-        setModule("admin:areaDistrict");
+        setModule("api:admin:areaDistrict");
     }
 
     // ================================================================================

@@ -36,7 +36,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
     public StorageController(SysStorageRepo service) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(service);
-        super.setModule("basic:storage").disableCreate().disableUpdate().disableDelete();
+        super.setModule("api:basic:storage").disableCreate().disableUpdate().disableDelete();
     }
 
     /**

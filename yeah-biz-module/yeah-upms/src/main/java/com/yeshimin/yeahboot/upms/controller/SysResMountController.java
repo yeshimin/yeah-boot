@@ -34,7 +34,7 @@ public class SysResMountController extends CrudController<SysResMountMapper, Sys
     public SysResMountController(SysResMountRepo service) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(service);
-        setModule("admin:sysResMount")
+        setModule("api:admin:sysResMount")
                 .disableCreate()
                 .disableQuery()
                 .disableDetail()
@@ -47,7 +47,7 @@ public class SysResMountController extends CrudController<SysResMountMapper, Sys
     /**
      * 查询视图资源已挂载的接口
      */
-    @PreAuthorize("@pms.hasPermission('admin:sysResMount:query')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':query')")
     @GetMapping("/queryByViewResId")
     public R<List<SysResMountEntity>> queryByViewResId(@RequestParam Long viewResId) {
         return R.ok(sysResMountService.queryByViewResId(viewResId));
@@ -56,7 +56,7 @@ public class SysResMountController extends CrudController<SysResMountMapper, Sys
     /**
      * 保存视图资源挂载接口（全量操作）
      */
-    @PreAuthorize("@pms.hasPermission('admin:sysResMount:save')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':save')")
     @SysLog(value = "设置视图资源接口", category = SysLogCategoryEnum.DATA)
     @PostMapping("/saveByViewResId")
     public R<Boolean> saveByViewResId(@Valid @RequestBody SysResMountSaveDto dto) {

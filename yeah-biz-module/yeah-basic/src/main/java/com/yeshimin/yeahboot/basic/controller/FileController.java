@@ -35,7 +35,7 @@ public class FileController extends CrudController<SysFileMapper, SysFileEntity,
     public FileController(SysFileRepo service) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(service);
-        super.setModule("basic:file").disableCreate().disableUpdate().disableDelete();
+        super.setModule("api:basic:file").disableCreate().disableUpdate().disableDelete();
     }
 
     /**

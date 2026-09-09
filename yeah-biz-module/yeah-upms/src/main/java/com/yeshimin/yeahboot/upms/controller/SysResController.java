@@ -34,7 +34,7 @@ public class SysResController extends CrudController<SysResMapper, SysResEntity,
     public SysResController(SysResRepo sysResRepo) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(sysResRepo);
-        setModule("admin:sysRes")
+        setModule("api:admin:sysRes")
                 .disableCreate()
                 .disableQuery()
                 .disableUpdate()

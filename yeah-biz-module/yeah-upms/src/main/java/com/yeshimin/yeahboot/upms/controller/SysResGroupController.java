@@ -36,7 +36,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
     public SysResGroupController(SysResGroupRepo service) {
         // 由于lombok方案无法实现构造方法中调用super，只能显式调用
         super(service);
-        setModule("admin:sysResGroup")
+        setModule("api:admin:sysResGroup")
                 .disableCreate()
                 .disableQuery()
                 .disableDetail()
@@ -49,7 +49,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
     /**
      * 查询树
      */
-    @PreAuthorize("@pms.hasPermission('admin:sysResGroup:tree')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':tree')")
     @GetMapping("/tree")
     public R<List<SysResGroupTreeNodeVo>> tree() {
         return R.ok(sysResGroupService.tree());
@@ -58,7 +58,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
     /**
      * 创建
      */
-    @PreAuthorize("@pms.hasPermission('admin:sysResGroup:create')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
     @SysLog(value = "创建接口资源分组", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysResGroupEntity> create(@Valid @RequestBody SysResGroupCreateDto dto) {
@@ -68,7 +68,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
     /**
      * 更新
      */
-    @PreAuthorize("@pms.hasPermission('admin:sysResGroup:update')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':update')")
     @SysLog(value = "更新接口资源分组", category = SysLogCategoryEnum.DATA)
     @PostMapping("/update")
     public R<SysResGroupEntity> update(@Valid @RequestBody SysResGroupUpdateDto dto) {
@@ -78,7 +78,7 @@ public class SysResGroupController extends CrudController<SysResGroupMapper, Sys
     /**
      * 删除
      */
-    @PreAuthorize("@pms.hasPermission('admin:sysResGroup:delete')")
+    @PreAuthorize("@pms.hasPermission(this.getModule() + ':delete')")
     @SysLog(value = "删除接口资源分组", category = SysLogCategoryEnum.DATA)
     @PostMapping("/delete")
     public R<Void> delete(@Valid @RequestBody IdsDto dto) {
