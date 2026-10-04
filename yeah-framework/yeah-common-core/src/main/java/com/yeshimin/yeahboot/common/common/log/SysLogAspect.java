@@ -88,8 +88,8 @@ public class SysLogAspect {
         // 快速排除常见类型
         if (result instanceof java.io.InputStream ||
                 result instanceof org.springframework.core.io.Resource ||
-                result instanceof javax.servlet.ServletRequest ||
-                result instanceof javax.servlet.ServletResponse ||
+                result instanceof jakarta.servlet.ServletRequest ||
+                result instanceof jakarta.servlet.ServletResponse ||
                 result instanceof java.io.OutputStream ||
                 result instanceof java.io.Writer) {
             return false;

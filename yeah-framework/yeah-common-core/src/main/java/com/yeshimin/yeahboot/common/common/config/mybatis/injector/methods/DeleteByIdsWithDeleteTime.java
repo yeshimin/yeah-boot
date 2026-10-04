@@ -55,7 +55,7 @@ public class DeleteByIdsWithDeleteTime extends DeleteByIds {
         sqlSet = LogicDeleteSqlUtils.appendDeleteTime(tableInfo, sqlSet);
 
         // 将表名、SET片段、主键列、ID集合和未删除条件填入框架模板
-        return String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlSet,
+        return sqlMethod.format(tableInfo.getTableName(), sqlSet,
                 tableInfo.getKeyColumn(), SqlScriptUtils.convertForeach(
                         // 集合元素既支持简单ID，也支持包含ID属性的实体对象
                         SqlScriptUtils.convertChoose(

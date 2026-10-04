@@ -2,8 +2,8 @@ package com.yeshimin.yeahboot.common.common.validation;
 
 import com.yeshimin.yeahboot.common.common.enums.base.IValueEnum;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 
 /**

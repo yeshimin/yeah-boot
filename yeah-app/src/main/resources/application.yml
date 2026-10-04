@@ -2,6 +2,9 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    # 默认激活dev
+    active: dev
   application:
     name: yeah-app
 
@@ -36,6 +39,8 @@ decorator:
       exclude-categories: "info,debug,result,resultset,commit,rollback"
 
 yeah-boot:
+  # app模块单独启动/打包的时候启用@MapperScan
+  app-mapper-scan-enabled: true
   # ID编号生成器
   id-generator:
     alphabet: GQT0FNR3taz1vDVEjsSJ2biZmLB8qk6OCMndohlKf4IAw7xr9eYgXWPcuHpU5y

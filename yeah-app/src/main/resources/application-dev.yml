@@ -8,12 +8,13 @@ spring:
     username: root
     password: 123456
   # redis
-  redis:
-    host: localhost
-    port: 6379
-    password: ""
-    database: 1
-    timeout: 10000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ""
+      database: 1
+      timeout: 10000
 
 # auth相关
 auth:

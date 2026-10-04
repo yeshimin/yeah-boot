@@ -5,28 +5,28 @@ import com.yeshimin.yeahboot.common.common.log.MdcLogFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
+@Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig {
 
     private final AuthService authService;
 
@@ -39,51 +39,40 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.handlerMapping = handlerMapping;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.cors().disable();
-        // 不需要session
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   AuthenticationManager authenticationManager) throws Exception {
         Map<String, PublicAccess> publicAccessUrls = this.getPublicAccessUrls();
         // for springdoc
         publicAccessUrls.putAll(this.getUrlsForSpringdoc());
         log.info("Public access URLs: {}", publicAccessUrls);
 
-        http.addFilterAfter(new JwtTokenAuthenticationFilter(authenticationManagerBean(), publicAccessUrls), LogoutFilter.class);
-        // mdc filter设置到认证filter之前，使相关日志尽早附带mdc信息
-        http.addFilterBefore(new MdcLogFilter(), JwtTokenAuthenticationFilter.class);
-
-        http.authorizeRequests()
-//                .antMatchers("/**/auth/login", "/admin/auth/captcha", "/public/storage/download")
-                .antMatchers("/actuator/health", "/actuator/info")
-                .permitAll()
-                // --------------------------------------------------------------------------------
-                .antMatchers(publicAccessUrls.keySet().toArray(new String[0]))
-                .permitAll()
-                .anyRequest().authenticated()
-                .and()
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                // 不需要session
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterAfter(new JwtTokenAuthenticationFilter(authenticationManager, publicAccessUrls), LogoutFilter.class)
+                // mdc filter设置到认证filter之前，使相关日志尽早附带mdc信息
+                .addFilterBefore(new MdcLogFilter(), JwtTokenAuthenticationFilter.class)
+                .authorizeHttpRequests(authorize -> {
+                    authorize.requestMatchers("/actuator/health", "/actuator/info").permitAll();
+                    if (!publicAccessUrls.isEmpty()) {
+                        authorize.requestMatchers(publicAccessUrls.keySet().toArray(new String[0])).permitAll();
+                    }
+                    authorize.anyRequest().authenticated();
+                })
                 // 自定义认证失败处理
-                .exceptionHandling()
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .accessDeniedHandler(new CustomAccessDeniedHandler());
-    }
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
-    /**
-     * 如果重写了authenticationManagerBean()，需要同时重写该方法
-     *
-     * @see WebSecurityConfigurerAdapter#authenticationManagerBean()
-     */
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authenticationProvider());
+        return http.build();
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManager(AuthenticationProvider authenticationProvider) {
+        return new ProviderManager(Collections.singletonList(authenticationProvider));
     }
 
     @Bean

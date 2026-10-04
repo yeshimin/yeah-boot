@@ -18,7 +18,9 @@ BASE_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
 JAR_NAME="yeah-admin.jar"
 PORT="8080"
 CONFIG_DIR="config"
-JAVA_BIN="${JAVA_BIN:-java}"
+JAVA_BIN="${JAVA_BIN:-}"
+JENV_JAVA_VERSION="${JENV_JAVA_VERSION:-}"
+JAVA_MIN_VERSION="${JAVA_MIN_VERSION:-21}"
 JAVA_OPTS="${JAVA_OPTS:--Xms256m -Xmx512m}"
 SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-}"
 START_WAIT_SECONDS="${START_WAIT_SECONDS:-3}"
@@ -40,7 +42,9 @@ usage() {
   -h, --help                显示帮助
 
 环境变量:
-  JAVA_BIN                  Java 命令路径，默认: java
+  JAVA_BIN                  Java 命令路径，优先级最高
+  JENV_JAVA_VERSION         可选 jenv 版本，例如 8 或 21
+  JAVA_MIN_VERSION          最低 JDK 版本，默认: 21
   JAVA_OPTS                 简单的空格分隔 JVM 参数
   SPRING_PROFILES_ACTIVE    可选 Spring Profile，例如 prod
   START_WAIT_SECONDS        启动后等待秒数，默认: 3
@@ -118,15 +122,72 @@ validate_port() {
   fi
 }
 
+resolve_java_bin() {
+  if [ -n "$JAVA_BIN" ]; then
+    return
+  fi
+
+  if [ -n "$JENV_JAVA_VERSION" ]; then
+    if ! command -v jenv >/dev/null 2>&1; then
+      echo "已设置 JENV_JAVA_VERSION，但未安装 jenv" >&2
+      exit 1
+    fi
+    JENV_JAVA_HOME=$(jenv prefix "$JENV_JAVA_VERSION" 2>/dev/null) || {
+      echo "jenv 中未找到 Java 版本: $JENV_JAVA_VERSION" >&2
+      exit 1
+    }
+    JAVA_BIN="$JENV_JAVA_HOME/bin/java"
+    return
+  fi
+
+  if [ -f "$BASE_DIR/.java-version" ] && command -v jenv >/dev/null 2>&1; then
+    JENV_LOCAL_VERSION=$(sed -n '1p' "$BASE_DIR/.java-version" | tr -d '[:space:]')
+    JENV_JAVA_HOME=$(jenv prefix "$JENV_LOCAL_VERSION" 2>/dev/null) || {
+      echo "无法根据 $BASE_DIR/.java-version 解析 jenv Java 版本: $JENV_LOCAL_VERSION" >&2
+      exit 1
+    }
+    JAVA_BIN="$JENV_JAVA_HOME/bin/java"
+    return
+  fi
+
+  JAVA_BIN="java"
+}
+
+validate_java_version() {
+  java_version=$("$JAVA_BIN" -version 2>&1 | awk -F '"' '/version/ { print $2; exit }')
+  java_major=${java_version%%.*}
+
+  if [ "$java_major" = "1" ]; then
+    java_major=${java_version#1.}
+    java_major=${java_major%%.*}
+  fi
+
+  case "$java_major" in
+    ''|*[!0-9]*)
+      echo "无法识别 Java 版本: $java_version" >&2
+      exit 1
+      ;;
+  esac
+
+  if [ "$java_major" -lt "$JAVA_MIN_VERSION" ]; then
+    echo "需要 JDK $JAVA_MIN_VERSION 或更高版本，当前版本: $java_version" >&2
+    exit 1
+  fi
+}
+
 check_start_requirements() {
   validate_port
+  validate_positive_integer "$JAVA_MIN_VERSION" "JAVA_MIN_VERSION"
   validate_positive_integer "$START_WAIT_SECONDS" "START_WAIT_SECONDS"
   validate_positive_integer "$STOP_WAIT_SECONDS" "STOP_WAIT_SECONDS"
+
+  resolve_java_bin
 
   if ! command -v "$JAVA_BIN" >/dev/null 2>&1; then
     echo "Java 命令不可用: $JAVA_BIN" >&2
     exit 1
   fi
+  validate_java_version
 
   if [ ! -f "$JAR_PATH" ]; then
     echo "未找到 Jar 文件: $JAR_PATH" >&2
@@ -161,6 +222,7 @@ start() {
 
   echo "启动服务: $JAR_PATH"
   echo "端口: $PORT"
+  echo "Java 命令: $JAVA_BIN（最低 JDK $JAVA_MIN_VERSION）"
   echo "配置目录: $CONFIG_DIR"
   echo "日志文件: $LOG_FILE"
 

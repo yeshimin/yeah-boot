@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -130,8 +130,8 @@ public class ApiLogAspect {
         if (result instanceof byte[] ||
                 result instanceof java.io.InputStream ||
                 result instanceof org.springframework.core.io.Resource ||
-                result instanceof javax.servlet.ServletRequest ||
-                result instanceof javax.servlet.ServletResponse ||
+                result instanceof jakarta.servlet.ServletRequest ||
+                result instanceof jakarta.servlet.ServletResponse ||
                 result instanceof java.io.OutputStream ||
                 result instanceof java.io.Writer) {
             return false;

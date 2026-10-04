@@ -10,7 +10,7 @@ import com.yeshimin.yeahboot.ws.websocket.domain.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 
 @Component

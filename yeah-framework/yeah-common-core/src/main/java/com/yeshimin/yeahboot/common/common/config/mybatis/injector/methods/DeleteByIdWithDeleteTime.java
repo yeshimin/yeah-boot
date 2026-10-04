@@ -64,7 +64,7 @@ public class DeleteByIdWithDeleteTime extends DeleteById {
             sqlSet = LogicDeleteSqlUtils.appendDeleteTime(tableInfo, sqlSet);
 
             // 将表名、SET片段、主键列、主键属性和未删除条件填入框架模板
-            sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlSet,
+            sql = sqlMethod.format(tableInfo.getTableName(), sqlSet,
                     tableInfo.getKeyColumn(), tableInfo.getKeyProperty(), tableInfo.getLogicDeleteSql(true, true));
 
             // 将SQL字符串解析成MyBatis可以执行的SqlSource
@@ -76,7 +76,7 @@ public class DeleteByIdWithDeleteTime extends DeleteById {
 
         // 实体没有@TableLogic时，完全保留MyBatis Plus默认的按ID物理删除行为
         sqlMethod = SqlMethod.DELETE_BY_ID;
-        sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(),
+        sql = sqlMethod.format(tableInfo.getTableName(),
                 tableInfo.getKeyColumn(), tableInfo.getKeyProperty());
 
         // 物理删除注册为Delete类型的MappedStatement

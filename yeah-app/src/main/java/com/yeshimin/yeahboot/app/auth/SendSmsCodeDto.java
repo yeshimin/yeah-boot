@@ -7,7 +7,7 @@ import com.yeshimin.yeahboot.common.common.sensitive.SensitiveType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 发送短信验证码-DTO

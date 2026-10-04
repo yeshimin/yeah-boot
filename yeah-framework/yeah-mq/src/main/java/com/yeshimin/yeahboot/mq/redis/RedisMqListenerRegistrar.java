@@ -11,7 +11,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,5 +53,10 @@ public class RedisMqListenerRegistrar {
         }
 
         container.start();
+    }
+
+    @PreDestroy
+    public void stop() {
+        container.stop();
     }
 }

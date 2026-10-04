@@ -33,7 +33,7 @@ public class DeleteWithDeleteTime extends Delete {
             String sqlSet = LogicDeleteSqlUtils.appendDeleteTime(tableInfo, sqlLogicSet(tableInfo));
 
             // 将表名、SET片段、Wrapper查询条件和SQL注释填入框架模板
-            sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlSet,
+            sql = sqlMethod.format(tableInfo.getTableName(), sqlSet,
                     sqlWhereEntityWrapper(true, tableInfo), sqlComment());
 
             // 将SQL字符串解析成MyBatis可以执行的SqlSource
@@ -45,7 +45,7 @@ public class DeleteWithDeleteTime extends Delete {
 
         // 实体没有@TableLogic时，完全保留MyBatis Plus默认的物理删除行为
         sqlMethod = SqlMethod.DELETE;
-        sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(),
+        sql = sqlMethod.format(tableInfo.getTableName(),
                 sqlWhereEntityWrapper(true, tableInfo), sqlComment());
         SqlSource sqlSource = super.createSqlSource(configuration, sql, modelClass);
 

@@ -2,7 +2,7 @@
 
 > 本文档由 AI 辅助生成，发布前建议结合实际配置与功能状态再做一次人工校对。
 
-> 基于 Java 8 / Spring Boot 2.7 的多模块后端快速开发框架，面向后台管理与 App 场景。
+> 基于 Java 21 / Spring Boot 3.5 的多模块后端快速开发框架，面向后台管理与 App 场景。
 
 ## 项目简介
 
@@ -57,15 +57,15 @@ yeah-boot
 
 ## 技术栈
 
-- Java 8
-- Spring Boot 2.7.18
+- Java 21
+- Spring Boot 3.5.16
 - Spring MVC
 - Spring Security
-- MyBatis-Plus
+- MyBatis-Plus 3.5.17
 - MySQL
 - Redis
 - JWT (`java-jwt`)
-- SpringDoc OpenAPI
+- SpringDoc OpenAPI 2
 - Hutool / Fastjson2
 - MinIO / 七牛云存储
 - 阿里云短信
@@ -85,7 +85,7 @@ yeah-boot
 
 ### 环境要求
 
-- JDK 8+
+- JDK 21+
 - Maven 3.8+
 - MySQL
 - Redis
@@ -126,6 +126,26 @@ mvn clean install
 ```bash
 SPRING_PROFILES_ACTIVE=prod sh deploy.sh start
 ```
+
+### 多 JDK 部署
+
+部署脚本默认要求 JDK 21，可通过环境变量为不同服务选择独立运行时。`JAVA_BIN` 优先级最高；未设置时，脚本会优先使用 `JENV_JAVA_VERSION`，再尝试解析服务目录中的 `.java-version`，最后回退到系统 `java`。
+
+使用服务目录的 `.java-version` 时，需将该文件与部署后的 `deploy.sh` 放在同一目录，例如文件内容为 `21`。
+
+```bash
+# 当前主线服务：默认要求 JDK 21
+JENV_JAVA_VERSION=21 sh deploy.sh start
+
+# JDK 8 维护线服务：显式指定运行时与最低版本
+# 版本标识以 jenv versions 输出为准，例如 1.8 或 1.8.0.362
+JENV_JAVA_VERSION=1.8 JAVA_MIN_VERSION=8 sh deploy.sh start
+
+# 不使用 jenv 时，直接指定 Java 可执行文件
+JAVA_BIN=/opt/jdk-21/bin/java sh deploy.sh start
+```
+
+同一台服务器上的每个服务应使用独立目录、Jar、端口、`config/`、日志和 PID 文件。
 
 ### 启动模式
 
@@ -208,7 +228,7 @@ yeah-boot.storage.impl.qiniu.secret-key=your-qiniu-secret-key
 - `yeah-boot.safe-mode=true` 表示关闭接口权限校验，适合本地联调或初始化阶段使用
 - 阿里云短信与七牛云存储相关配置按需启用，不使用时可不配置
 - 仓库中的 JWT 相关 key/secret 仅用于测试或开发环境，正式部署前务必替换为你自己的安全配置
-- 除上述自定义配置外，仍需补充 `spring.datasource.*`、`spring.redis.*` 等标准 Spring Boot 配置
+- 除上述自定义配置外，仍需补充 `spring.datasource.*`、`spring.data.redis.*` 等标准 Spring Boot 配置
 
 ### 登录页公告与自注册
 

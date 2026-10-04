@@ -2,7 +2,7 @@ package com.yeshimin.yeahboot.common.controller.base;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.yeshimin.yeahboot.common.common.config.mybatis.QueryHelper;
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
