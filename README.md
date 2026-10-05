@@ -248,10 +248,30 @@ yeah-boot.storage.impl.qiniu.secret-key=your-qiniu-secret-key
 
 ## 开发建议
 
-- 业务通用能力优先放入 `yeah-framework` 或 `yeah-biz-common`
-- 面向后台的接口优先放入 `yeah-admin` / `yeah-upms`
-- 面向 App 的接口优先放入 `yeah-app`
+- 具体项目业务优先放入独立的业务模块，不要直接修改内置模块
+- 面向后台与 App 的接口分别保留 `/admin`、`/app` 前缀，并按终端规划入口
 - 业务模块尽量复用现有通用返回、异常、Repo 与存储抽象
+
+## 二次开发与升级
+
+将 YeahBoot 的内置代码视为上游基线。除修复可回馈给通用框架的问题外，二次开发不要直接承载在以下位置：
+
+- `yeah-framework`：认证、缓存、存储、MQ、通知等基础设施
+- `yeah-biz-common`：跨业务共享数据与服务
+- `yeah-upms`、`yeah-basic`、`yeah-public`：内置系统管理与基础能力
+- `yeah-admin`、`yeah-app`：启动与装配入口
+
+推荐为项目领域新建独立业务模块，例如 `yeah-biz-order`、`yeah-biz-member`，与内置业务模块保持同级。模块内自行组织 Entity、DTO、Mapper、Repo、Service 与 Controller；仅在 Maven 聚合、启动工程依赖和资源数据处做必要接入。这样升级上游时，冲突集中在少量集成文件，而不会散落在框架代码中。
+
+升级时建议遵循以下流程：
+
+1. 将本项目业务代码保持为小而独立的提交，不混入框架改动。
+2. 新建升级分支，合并或变基到目标 YeahBoot 版本。
+3. 优先保留上游框架、内置模块和依赖版本变更，再恢复自定义模块的最小集成改动。
+4. 检查数据库迁移、资源权限、外部 `config/` 覆盖项和部署脚本。
+5. 执行 `mvn clean package -DskipTests`，并与管理后台一起完成关键角色、接口权限和数据迁移验证。
+
+项目凭据和环境差异应保留在 Jar 同级 `config/` 或部署环境中，不要修改或提交仓库内的默认配置来适配某一套环境。
 
 ## Roadmap
 
