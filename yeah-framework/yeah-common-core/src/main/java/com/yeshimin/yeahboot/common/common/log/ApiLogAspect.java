@@ -30,7 +30,7 @@ public class ApiLogAspect {
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 
-    @Pointcut("execution(public * com.yeshimin.yeahboot..controller..*.*(..))")
+    @Pointcut("execution(public * com.yeshimin.yeahboot..*Controller.*(..))")
     public void pointcut() {
     }
 

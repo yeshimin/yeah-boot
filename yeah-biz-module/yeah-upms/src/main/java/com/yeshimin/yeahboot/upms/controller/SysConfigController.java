@@ -1,9 +1,13 @@
 package com.yeshimin.yeahboot.upms.controller;
 
+import cn.hutool.core.util.StrUtil;
+import com.yeshimin.yeahboot.auth.common.config.security.PublicAccess;
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
+import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.CrudController;
 import com.yeshimin.yeahboot.common.domain.base.IdsDto;
+import com.yeshimin.yeahboot.common.domain.base.NameValueVo;
 import com.yeshimin.yeahboot.common.domain.base.R;
 import com.yeshimin.yeahboot.data.domain.entity.SysConfigEntity;
 import com.yeshimin.yeahboot.data.mapper.SysConfigMapper;
@@ -12,14 +16,12 @@ import com.yeshimin.yeahboot.data.service.DynamicConfigService;
 import com.yeshimin.yeahboot.upms.domain.dto.SysConfigCreateDto;
 import com.yeshimin.yeahboot.upms.domain.dto.SysConfigUpdateDto;
 import com.yeshimin.yeahboot.upms.service.SysConfigService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
+import java.util.List;
 
 /**
  * 系统参数管理
@@ -86,5 +88,22 @@ public class SysConfigController extends CrudController<SysConfigMapper, SysConf
     public R<Void> refreshCache() {
         dynamicConfigService.refreshCache();
         return R.ok();
+    }
+
+    /**
+     * 按参数分组或参数键获取启用且允许匿名访问的系统参数。
+     */
+    @PublicAccess
+    @GetMapping("/publicConfig")
+    public R<List<NameValueVo>> publicConfig(@RequestParam(required = false) String groupCode,
+                                             @RequestParam(required = false) String configKey) {
+        boolean hasGroupCode = StrUtil.isNotBlank(groupCode);
+        boolean hasConfigKey = StrUtil.isNotBlank(configKey);
+        if (hasGroupCode == hasConfigKey) {
+            throw new BaseException("groupCode和configKey必须且只能提供一个");
+        }
+        return hasGroupCode
+                ? R.ok(dynamicConfigService.getPublicConfigsByGroupCode(groupCode))
+                : R.ok(dynamicConfigService.getPublicConfigsByConfigKey(configKey));
     }
 }
