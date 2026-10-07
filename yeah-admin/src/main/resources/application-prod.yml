@@ -40,10 +40,10 @@ auth:
         terminals:
           - name: web
             # 同一个账号在该终端的最大在线token数量（默认-1，表示不限制）（不可超过总的最大在线token数量）
-            max-online-token-count: 1
+            max-online-token-count: 100
           - name: api
             # 同一个账号在该终端的最大在线token数量（默认-1，表示不限制）（不可超过总的最大在线token数量）
-            max-online-token-count: -1
+            max-online-token-count: 0
         # 同一个账号的最大在线token数量（默认-1，表示不限制）
         max-online-token-count: 10
         # 同一个账号的最大在线终端数量（默认-1，表示不限制）
@@ -60,14 +60,14 @@ auth:
         terminals:
           - name: app
             # 同一个账号在该终端的最大在线token数量（默认-1，表示不限制）（不可超过总的最大在线token数量）
-            max-online-token-count: 1
+            max-online-token-count: 0
           - name: api
             # 同一个账号在该终端的最大在线token数量（默认-1，表示不限制）（不可超过总的最大在线token数量）
-            max-online-token-count: -1
+            max-online-token-count: 0
         # 同一个账号的最大在线token数量（默认-1，表示不限制）
-        max-online-token-count: 10
+        max-online-token-count: 0
         # 同一个账号的最大在线终端数量（默认-1，表示不限制）
-        max-online-terminal-count: -1
+        max-online-terminal-count: 0
 
 yeah-boot:
   # 文件/存储
