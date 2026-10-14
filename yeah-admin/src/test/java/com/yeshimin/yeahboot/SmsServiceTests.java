@@ -26,7 +26,7 @@ public class SmsServiceTests {
     @Test
     public void sendSmsTest() {
         // 生成短信验证码
-        Integer smsCodeLength = dynamicConfigService.getInteger(SysConfigEnum.SMS_CODE_LENGTH);
+        Integer smsCodeLength = dynamicConfigService.getInteger(SysConfigEnum.GLOBAL_SMS_CODE_LENGTH);
         String smsCode = RandomUtil.randomNumbers(smsCodeLength);
         SendSmsResponse response = smsService.sendSms(smsCode, "152****3680");
         log.info("Response: {}", JSON.toJSONString(response));

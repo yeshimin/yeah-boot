@@ -47,11 +47,14 @@ public abstract class BaseService {
 
     @SneakyThrows
     private ResponseEntity<InputStreamResource> wrapForPreview(String filename, InputStream inputStream) {
-        // 并不能支持所有的MIME类型，图片的可以；待优化
         String contentType = HttpUtil.getMimeType(filename);
         MediaType mediaType = MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream");
+        HttpHeaders headers = new HttpHeaders();
+        // 预览响应禁止 MIME 嗅探，避免内容与文件名不一致时被浏览器按可执行内容处理。
+        headers.add("X-Content-Type-Options", "nosniff");
 
         return ResponseEntity.ok()
+                .headers(headers)
                 .contentType(mediaType)
                 .cacheControl(CacheControl.noCache())
                 .body(new InputStreamResource(inputStream));

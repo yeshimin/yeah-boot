@@ -15,11 +15,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 动态系统参数服务
@@ -137,7 +133,6 @@ public class DynamicConfigService {
         cacheService.set(CacheKeyConsts.SYSTEM_CONFIG, JSON.toJSONString(values));
         cacheService.set(CacheKeyConsts.SYSTEM_PUBLIC_CONFIG, JSON.toJSONString(publicValues));
         log.info("系统参数缓存刷新完成，启用参数数量: {}，参数键: {}", values.size(), values.keySet());
-        this.logKnownConfig(values);
     }
 
     /**
@@ -242,38 +237,19 @@ public class DynamicConfigService {
         return values == null ? new LinkedHashMap<>() : values;
     }
 
+    /**
+     * 解析 Redis 中的完整参数快照；格式异常由调用方捕获后触发重建。
+     */
     private Map<String, String> parseCache(String json) {
         return JSON.parseObject(json, new TypeReference<Map<String, String>>() {
         });
     }
 
+    /**
+     * 解析按分组缓存的公开参数快照。
+     */
     private Map<String, List<NameValueVo>> parsePublicConfigCache(String json) {
         return JSON.parseObject(json, new TypeReference<Map<String, List<NameValueVo>>>() {
         });
-    }
-
-    /**
-     * 打印已接入的动态配置，短信供应商标识类配置固定脱敏
-     */
-    private void logKnownConfig(Map<String, String> values) {
-        log.info("动态配置...captchaEnabled: {}, loginFailureWindowSeconds: {}, loginMaxFailureCount: {}, "
-                        + "loginLockSeconds: {}, smsCodeLength: {}, smsCodeExpSeconds: {}, smsTemplateCode: {}, "
-                        + "smsSignName: {}, excelMaxImportFileSizeMb: {}, excelMaxImportRows: {}, "
-                        + "excelMaxExportRows: {}, excelMaxErrorMessages: {}",
-                this.getLogValue(values, SysConfigEnum.CAPTCHA_ENABLED),
-                this.getLogValue(values, SysConfigEnum.ADMIN_LOGIN_FAILURE_WINDOW_SECONDS),
-                this.getLogValue(values, SysConfigEnum.ADMIN_LOGIN_MAX_FAILURE_COUNT),
-                this.getLogValue(values, SysConfigEnum.ADMIN_LOGIN_LOCK_SECONDS),
-                this.getLogValue(values, SysConfigEnum.SMS_CODE_LENGTH),
-                this.getLogValue(values, SysConfigEnum.SMS_CODE_EXP_SECONDS),
-                "******", "******",
-                this.getLogValue(values, SysConfigEnum.SYS_USER_EXCEL_MAX_IMPORT_FILE_SIZE_MB),
-                this.getLogValue(values, SysConfigEnum.SYS_USER_EXCEL_MAX_IMPORT_ROWS),
-                this.getLogValue(values, SysConfigEnum.SYS_USER_EXCEL_MAX_EXPORT_ROWS),
-                this.getLogValue(values, SysConfigEnum.SYS_USER_EXCEL_MAX_ERROR_MESSAGES));
-    }
-
-    private String getLogValue(Map<String, String> values, SysConfigEnum config) {
-        return values.getOrDefault(config.getKey(), config.getDefaultValue());
     }
 }

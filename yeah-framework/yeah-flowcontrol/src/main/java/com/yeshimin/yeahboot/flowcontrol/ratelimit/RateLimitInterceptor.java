@@ -3,6 +3,7 @@ package com.yeshimin.yeahboot.flowcontrol.ratelimit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import com.yeshimin.yeahboot.common.common.utils.ClientIpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -407,7 +408,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private String getGroupName(RateLimitConf rlConf, Method m, HttpServletRequest request) {
         switch (rlConf.getGroupType()) {
             case IP:
-                return request.getRemoteAddr();
+                return ClientIpUtils.getClientIp(request);
             case CUSTOM:
                 return this.getCustomGroupName(rlConf.getCustomGroup(), request, m);
             case NONE:

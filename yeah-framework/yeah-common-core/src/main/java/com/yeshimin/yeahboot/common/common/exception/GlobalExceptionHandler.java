@@ -22,13 +22,20 @@ import java.util.Optional;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /** 未预期异常对客户端使用的通用提示，详细原因仅保留在服务端日志。 */
+    private static final String SYSTEM_ERROR_MESSAGE = "系统异常，请联系管理员";
+
+    /** 无法安全归类的请求解析异常对客户端使用的通用提示。 */
+    private static final String INVALID_REQUEST_MESSAGE = "请求格式错误";
+
     /**
      * 处理兜底异常
      */
     @ExceptionHandler(Exception.class)
     public R<Void> handleException(Exception e) {
-        log.error(String.format("handleException(), e.msg: %s", e.getMessage()), e);
-        return R.fail(e.getMessage());
+        // 保留完整异常栈供按 traceId 排查，不能将框架、SQL 或内部实现细节回显给客户端。
+        log.error("系统异常", e);
+        return R.fail(SYSTEM_ERROR_MESSAGE);
     }
 
     /**
@@ -53,7 +60,7 @@ public class GlobalExceptionHandler {
             NoHandlerFoundException.class,
             BindException.class})
     public R<Void> handleParamException(Exception e) {
-        String msg = e.getMessage();
+        String msg = INVALID_REQUEST_MESSAGE;
         if (e instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException ex = (MethodArgumentNotValidException) e;
             msg = Optional.ofNullable(ex.getBindingResult().getFieldError())
@@ -71,7 +78,8 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException ex = (MethodArgumentTypeMismatchException) e;
             msg = "参数类型错误: " + ex.getName();
         }
-        log.error(String.format("handleParamException(), e.msg: %s", msg), e);
+        // 客户端只接收受控参数提示，原始解析异常仍写入服务端日志。
+        log.error("请求参数异常: {}", msg, e);
         return R.fail(msg);
     }
 }

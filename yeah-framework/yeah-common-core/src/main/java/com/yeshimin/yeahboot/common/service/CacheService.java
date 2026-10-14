@@ -20,56 +20,63 @@ public class CacheService {
     private final StringRedisTemplate redisTemplate;
 
     /**
-     * set
+     * 写入永不过期的字符串缓存。
      */
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
     }
 
     /**
-     * set with timeout seconds
+     * 写入指定秒数后过期的字符串缓存。
      */
     public void set(String key, String value, long timeout) {
         redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     }
 
     /**
-     * get string value
+     * 仅在键不存在时写入值，并原子设置过期时间。
+     */
+    public Boolean setIfAbsent(String key, String value, Duration timeout) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value, timeout);
+    }
+
+    /**
+     * 读取字符串缓存。
      */
     public String get(String key) {
         return redisTemplate.opsForValue().get(key);
     }
 
     /**
-     * get by class
+     * 读取 JSON 缓存并反序列化为指定类型。
      */
     public <T> T get(String key, Class<T> clazz) {
         return JSON.parseObject(redisTemplate.opsForValue().get(key), clazz);
     }
 
     /**
-     * get hash
+     * 读取 Hash 全部字段。
      */
     public Map<Object, Object> getHash(String key) {
         return redisTemplate.opsForHash().entries(key);
     }
 
     /**
-     * set hash
+     * 批量写入 Hash 字段。
      */
     public void setHash(String key, Map<String, String> map) {
         redisTemplate.opsForHash().putAll(key, map);
     }
 
     /**
-     * set hash
+     * 写入单个 Hash 字段。
      */
     public void setHash(String key, String field, String value) {
         redisTemplate.opsForHash().put(key, field, value);
     }
 
     /**
-     * delete keys
+     * 删除一个或多个缓存键。
      */
     public Boolean delete(String... keys) {
         if (keys == null || keys.length == 0) {
@@ -80,7 +87,7 @@ public class CacheService {
     }
 
     /**
-     * delete key fields
+     * 删除 Hash 中的指定字段。
      */
     public Boolean deleteHashFields(String key, Object... fields) {
         if (fields == null || fields.length == 0) {
@@ -90,42 +97,42 @@ public class CacheService {
     }
 
     /**
-     * expire
+     * 设置缓存键的秒级过期时间。
      */
     public Boolean expire(String key, long timeoutSeconds) {
         return redisTemplate.expire(key, timeoutSeconds, TimeUnit.SECONDS);
     }
 
     /**
-     * expire
+     * 设置缓存键的 Duration 过期时间。
      */
     public Boolean expire(String key, Duration timeout) {
         return redisTemplate.expire(key, timeout);
     }
 
     /**
-     * expireAt
+     * 设置缓存键在指定秒级时间戳到期。
      */
     public Boolean expireAt(String key, int expireAtS) {
         return redisTemplate.expireAt(key, new Date(expireAtS * 1000L));
     }
 
     /**
-     * getExpire seconds
+     * 获取缓存键剩余过期秒数。
      */
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
     /**
-     * exists
+     * 判断缓存键是否存在。
      */
     public Boolean exists(String key) {
         return redisTemplate.hasKey(key);
     }
 
     /**
-     * execute lua script
+     * 执行返回 Long 的 Lua 脚本。
      */
     public Long executeLua(String luaScript, List<String> keys, List<String> args) {
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
@@ -140,56 +147,56 @@ public class CacheService {
     }
 
     /**
-     * get members of set
+     * 获取 Set 全部成员。
      */
     public Set<String> members(String key) {
         return redisTemplate.opsForSet().members(key);
     }
 
     /**
-     * is member
+     * 判断值是否属于 Set。
      */
     public Boolean isMember(String key, String member) {
         return redisTemplate.opsForSet().isMember(key, member);
     }
 
     /**
-     * add member to set
+     * 向 Set 添加成员。
      */
     public Long addMember(String key, String member) {
         return redisTemplate.opsForSet().add(key, member);
     }
 
     /**
-     * remove member from set
+     * 从 Set 移除成员。
      */
     public Long removeMember(String key, String member) {
         return redisTemplate.opsForSet().remove(key, member);
     }
 
     /**
-     * increase
+     * 将数值缓存递增 1。
      */
     public Long increase(String key) {
         return this.increase(key, 1);
     }
 
     /**
-     * increase by delta
+     * 将数值缓存递增指定值。
      */
     public Long increase(String key, long delta) {
         return redisTemplate.opsForValue().increment(key, delta);
     }
 
     /**
-     * decrease
+     * 将数值缓存递减 1。
      */
     public Long decrease(String key) {
         return this.decrease(key, 1L);
     }
 
     /**
-     * decrease by delta
+     * 将数值缓存递减指定值。
      */
     public Long decrease(String key, long delta) {
         return redisTemplate.opsForValue().decrement(key, delta);

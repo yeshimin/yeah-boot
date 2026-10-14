@@ -133,9 +133,9 @@ public class JwtService {
         try {
             return verifier.verify(jwt);
         } catch (JWTDecodeException e) {
-            log.error("jwt: {} valid fail", jwt);
+            log.error("jwt valid fail", e);
         } catch (Exception e) {
-            log.error("jwt: {} valid error", jwt);
+            log.error("jwt valid error", e);
         }
         return null;
     }

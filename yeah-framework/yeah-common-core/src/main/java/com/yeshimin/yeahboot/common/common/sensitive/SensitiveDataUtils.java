@@ -124,14 +124,20 @@ public final class SensitiveDataUtils {
      * @return 脱敏后的参数值；非敏感参数原样返回
      */
     private static String maskLogParameterByName(String name, String value) {
-        // 密码和令牌不保留任何原始内容
+        // 密码不保留任何原始内容
         if ("password".equalsIgnoreCase(name)
                 || "oldPassword".equalsIgnoreCase(name)
-                || "newPassword".equalsIgnoreCase(name)
-                || "token".equalsIgnoreCase(name)
-                || "accessToken".equalsIgnoreCase(name)
-                || "refreshToken".equalsIgnoreCase(name)) {
+                || "newPassword".equalsIgnoreCase(name)) {
             return FULL_MASK;
+        }
+
+        // 令牌保留有限片段，便于排查同一凭据的异常请求，同时避免记录完整凭据
+        if ("token".equalsIgnoreCase(name)
+                || "access_token".equalsIgnoreCase(name)
+                || "accessToken".equalsIgnoreCase(name)
+                || "refreshToken".equalsIgnoreCase(name)
+                || "authorization".equalsIgnoreCase(name)) {
+            return mask(value, SensitiveType.TOKEN);
         }
 
         // 结构化敏感数据按对应类型保留必要的可识别部分
@@ -191,6 +197,8 @@ public final class SensitiveDataUtils {
                 return maskOrFull(value, DesensitizedUtil.address(value, Math.min(8, value.length())));
             case CERT:
                 return maskOrFull(value, DesensitizedUtil.idCardNum(value, 6, 4));
+            case TOKEN:
+                return maskToken(value);
             case FULL:
             default:
                 return FULL_MASK;
@@ -206,5 +214,21 @@ public final class SensitiveDataUtils {
      */
     private static String maskOrFull(String original, String masked) {
         return StrUtil.isBlank(masked) || original.equals(masked) ? FULL_MASK : masked;
+    }
+
+    /**
+     * 令牌仅保留认证方案、前八位和后六位，兼顾关联排查与凭据最小暴露。
+     */
+    private static String maskToken(String value) {
+        String prefix = "";
+        String token = value;
+        if (value.regionMatches(true, 0, "Bearer ", 0, "Bearer ".length())) {
+            prefix = value.substring(0, "Bearer ".length());
+            token = value.substring("Bearer ".length());
+        }
+        if (token.length() <= 14) {
+            return prefix + FULL_MASK;
+        }
+        return prefix + token.substring(0, 8) + FULL_MASK + token.substring(token.length() - 6);
     }
 }

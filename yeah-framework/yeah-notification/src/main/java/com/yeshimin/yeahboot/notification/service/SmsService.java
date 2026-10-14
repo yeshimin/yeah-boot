@@ -44,7 +44,7 @@ public class SmsService {
     public SendSmsResponse sendSms(String smsCode, String... numbers) {
         Map<String, String> templateParam = new HashMap<>();
         templateParam.put("code", smsCode);
-        String templateCode = dynamicConfigService.getString(SysConfigEnum.SMS_TEMPLATE_CODE);
+        String templateCode = dynamicConfigService.getString(SysConfigEnum.GLOBAL_SMS_ALIYUN_TEMPLATE_CODE);
         return this.sendSms(templateCode, templateParam, numbers);
     }
 
@@ -52,7 +52,7 @@ public class SmsService {
         // 构造请求对象，请填入请求参数值
         SendSmsRequest request = new SendSmsRequest()
                 .setPhoneNumbers(String.join(",", numbers))
-                .setSignName(dynamicConfigService.getString(SysConfigEnum.SMS_SIGN_NAME))
+                .setSignName(dynamicConfigService.getString(SysConfigEnum.GLOBAL_SMS_ALIYUN_SIGN_NAME))
                 .setTemplateCode(templateCode)
                 .setTemplateParam(JSON.toJSONString(templateParam));
 

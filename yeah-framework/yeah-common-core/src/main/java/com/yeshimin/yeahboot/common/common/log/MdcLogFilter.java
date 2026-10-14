@@ -18,10 +18,18 @@ import java.util.UUID;
  */
 public class MdcLogFilter extends GenericFilterBean {
 
+    /** MDC 中保存聚合日志文本的键。 */
     public static final String MDC_INFO = "mdc-info";
+
+    /** MDC 中保存请求追踪标识的键。 */
     public static final String MDC_REQ_ID = "reqId";
+
+    /** MDC 中保存当前认证用户标识的键。 */
     public static final String MDC_USER_ID = "userId";
 
+    /**
+     * 在请求进入认证与业务链前写入 MDC，并在链路结束后清理线程上下文。
+     */
     @Override
     @SneakyThrows
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
@@ -36,6 +44,9 @@ public class MdcLogFilter extends GenericFilterBean {
         }
     }
 
+    /**
+     * 写入当前请求的追踪标识和已解析用户标识。
+     */
     private void setMdcInfo() {
         String uuid = UUID.randomUUID().toString();
         Long userId = WebContextUtils.getUserId();

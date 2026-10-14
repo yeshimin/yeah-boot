@@ -11,6 +11,7 @@ import com.yeshimin.yeahboot.common.common.enums.DataStatusEnum;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.SysConfigEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
+import com.yeshimin.yeahboot.common.common.utils.ClientIpUtils;
 import com.yeshimin.yeahboot.common.service.PasswordService;
 import com.yeshimin.yeahboot.data.domain.entity.SysRoleEntity;
 import com.yeshimin.yeahboot.data.domain.entity.SysUserEntity;
@@ -51,15 +52,19 @@ public class AdminAuthService {
     public LoginVo login(LoginDto loginDto) {
         String termValue = StrUtil.blankToDefault(loginDto.getTerminal(), AuthTerminalEnum.WEB.getValue());
 
-        // 密码校验前先检查当前用户名和终端组合是否已被临时锁定
-        loginAttemptService.checkLocked(loginDto.getUsername(), termValue);
+        // 检查IP白名单
+        String clientIp = ClientIpUtils.getCurrentClientIp();
+        loginAttemptService.checkLoginAllowed(clientIp);
+
+        // 密码校验前先检查当前用户名、终端和可选IP维度是否已被临时锁定
+        loginAttemptService.checkLocked(loginDto.getUsername(), termValue, clientIp);
 
         AuthenticateDto authenticateDto = new AuthenticateDto();
         authenticateDto.setUsername(loginDto.getUsername());
         authenticateDto.setPassword(loginDto.getPassword());
         AuthenticateVo authenticateVo = this.authenticate(authenticateDto);
         if (!authenticateVo.getSuccess()) {
-            long remaining = loginAttemptService.recordFailure(loginDto.getUsername(), termValue);
+            long remaining = loginAttemptService.recordFailure(loginDto.getUsername(), termValue, clientIp);
             if (remaining <= 0) {
                 throw new BaseException(ErrorCodeEnum.FAIL,
                         "登录失败次数过多，请" + loginAttemptService.getLockSeconds() + "秒后重试");
@@ -68,7 +73,7 @@ public class AdminAuthService {
         }
 
         // 登录认证成功，清除当前维度的历史失败记录
-        loginAttemptService.clear(loginDto.getUsername(), termValue);
+        loginAttemptService.clearCurrent(loginDto.getUsername(), termValue, clientIp);
 
         String userId = String.valueOf(authenticateVo.getUserId());
         String subValue = AuthSubjectEnum.ADMIN.getValue();
@@ -85,7 +90,7 @@ public class AdminAuthService {
      * 解除指定用户名和终端的登录失败次数及临时锁定
      */
     public void clearLoginLimit(ClearLoginLimitDto dto) {
-        loginAttemptService.clear(dto.getUsername(), dto.getTerminal());
+        loginAttemptService.clearAll(dto.getUsername(), dto.getTerminal());
     }
 
     /**
@@ -105,7 +110,7 @@ public class AdminAuthService {
         this.checkRegisterEnabled();
         captchaService.checkCaptcha(dto.getKey(), dto.getCode());
 
-        String roleCode = dynamicConfigService.getString(SysConfigEnum.AUTH_LOGIN_REGISTER_DEFAULT_ROLE_CODE);
+        String roleCode = dynamicConfigService.getString(SysConfigEnum.ADMIN_AUTH_LOGIN_REGISTER_DEFAULT_ROLE_CODE);
         if (StrUtil.isBlank(roleCode)) {
             throw new BaseException("自注册默认角色未配置");
         }
@@ -124,14 +129,20 @@ public class AdminAuthService {
 
     // ================================================================================
 
+    /**
+     * 在注册入口执行前统一校验动态注册开关。
+     */
     private void checkRegisterEnabled() {
         if (!this.isRegisterEnabled()) {
             throw new BaseException("当前未开放注册");
         }
     }
 
+    /**
+     * 读取管理后台匿名注册是否启用。
+     */
     private boolean isRegisterEnabled() {
-        return BooleanUtil.isTrue(dynamicConfigService.getBoolean(SysConfigEnum.AUTH_LOGIN_REGISTER_ENABLED));
+        return BooleanUtil.isTrue(dynamicConfigService.getBoolean(SysConfigEnum.ADMIN_AUTH_LOGIN_REGISTER_ENABLED));
     }
 
     // ================================================================================

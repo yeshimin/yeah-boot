@@ -43,6 +43,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      * 上传文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':upload')")
+    @SysLog(value = "上传存储文件", category = SysLogCategoryEnum.FILE)
     @PostMapping("/upload")
     public R<FileUploadVo> upload(@RequestParam("file") MultipartFile file,
                                   @RequestParam(required = false) Integer storageType,

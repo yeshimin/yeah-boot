@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.app.auth;
 
 import com.yeshimin.yeahboot.auth.common.config.security.PublicAccess;
+import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.controller.base.BaseController;
 import com.yeshimin.yeahboot.common.domain.base.R;
@@ -28,7 +29,7 @@ public class AppAuthController extends BaseController {
      * 登录
      */
     @PublicAccess
-    @SysLog("登录")
+    @SysLog(value = "登录", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/login")
     public R<LoginVo> login(@Valid @RequestBody LoginDto dto) {
         return R.ok(appAuthService.login(dto));
@@ -38,7 +39,7 @@ public class AppAuthController extends BaseController {
      * 发送短信验证码
      */
     @PublicAccess
-    @SysLog("发送短信验证码")
+    @SysLog(value = "发送短信验证码", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/sendSmsCode")
     public R<Void> sendSmsCode(@Valid @RequestBody SendSmsCodeDto dto) {
         appAuthService.sendSmsCode(dto);

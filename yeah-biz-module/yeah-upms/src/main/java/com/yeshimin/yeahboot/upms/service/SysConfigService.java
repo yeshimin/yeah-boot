@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.yeshimin.yeahboot.common.common.enums.SysConfigEnum;
 import com.yeshimin.yeahboot.common.common.enums.SysConfigValueTypeEnum;
 import com.yeshimin.yeahboot.common.common.exception.BaseException;
+import com.yeshimin.yeahboot.common.common.utils.ClientIpUtils;
 import com.yeshimin.yeahboot.data.domain.entity.SysConfigEntity;
 import com.yeshimin.yeahboot.data.repository.SysConfigRepo;
 import com.yeshimin.yeahboot.upms.domain.dto.SysConfigCreateDto;
@@ -23,16 +24,19 @@ import java.util.Set;
 public class SysConfigService {
 
     private static final Set<SysConfigEnum> LONG_POSITIVE_CONFIGS = new HashSet<>(Arrays.asList(
-            SysConfigEnum.ADMIN_LOGIN_FAILURE_WINDOW_SECONDS,
-            SysConfigEnum.ADMIN_LOGIN_MAX_FAILURE_COUNT,
-            SysConfigEnum.ADMIN_LOGIN_LOCK_SECONDS,
-            SysConfigEnum.SYS_USER_EXCEL_MAX_IMPORT_FILE_SIZE_MB));
+            SysConfigEnum.ADMIN_AUTH_LOGIN_FAILURE_WINDOW_SECONDS,
+            SysConfigEnum.ADMIN_AUTH_LOGIN_FAILURE_COUNT,
+            SysConfigEnum.ADMIN_AUTH_LOGIN_LOCK_SECONDS,
+            SysConfigEnum.ADMIN_STORAGE_UPLOAD_MAX_SIZE_MB,
+            SysConfigEnum.ADMIN_IMPORT_EXPORT_SYS_USER_EXCEL_MAX_IMPORT_FILE_SIZE_MB));
 
     private static final Set<SysConfigEnum> INTEGER_POSITIVE_CONFIGS = new HashSet<>(Arrays.asList(
-            SysConfigEnum.SMS_CODE_EXP_SECONDS,
-            SysConfigEnum.SYS_USER_EXCEL_MAX_IMPORT_ROWS,
-            SysConfigEnum.SYS_USER_EXCEL_MAX_EXPORT_ROWS,
-            SysConfigEnum.SYS_USER_EXCEL_MAX_ERROR_MESSAGES));
+            SysConfigEnum.GLOBAL_SMS_CODE_EXP_SECONDS,
+            SysConfigEnum.ADMIN_AUTH_PASSWORD_MIN_LENGTH,
+            SysConfigEnum.ADMIN_AUTH_PASSWORD_MAX_LENGTH,
+            SysConfigEnum.ADMIN_IMPORT_EXPORT_SYS_USER_EXCEL_MAX_IMPORT_ROWS,
+            SysConfigEnum.ADMIN_IMPORT_EXPORT_SYS_USER_EXCEL_MAX_EXPORT_ROWS,
+            SysConfigEnum.ADMIN_IMPORT_EXPORT_SYS_USER_EXCEL_MAX_ERROR_MESSAGES));
 
     private final SysConfigRepo sysConfigRepo;
 
@@ -116,15 +120,42 @@ public class SysConfigService {
         }
 
         this.requireType(type, config.getValueType());
-        if (config == SysConfigEnum.SMS_CODE_LENGTH) {
+        if (config == SysConfigEnum.GLOBAL_SMS_CODE_LENGTH) {
             int value = this.parseInteger(configValue);
             if (value < 4 || value > 8) {
                 throw new BaseException("短信验证码长度必须在4到8之间");
             }
             return;
         }
+        if (config == SysConfigEnum.ADMIN_AUTH_PASSWORD_MIN_LENGTH) {
+            int value = this.parseInteger(configValue);
+            if (value < 6 || value > 64) {
+                throw new BaseException("密码最小长度必须在6到64之间");
+            }
+            return;
+        }
+        if (config == SysConfigEnum.ADMIN_AUTH_PASSWORD_MAX_LENGTH) {
+            int value = this.parseInteger(configValue);
+            if (value < 6 || value > 128) {
+                throw new BaseException("密码最大长度必须在6到128之间");
+            }
+            return;
+        }
+        if (config == SysConfigEnum.ADMIN_STORAGE_UPLOAD_ALLOWED_EXTENSIONS
+                || config == SysConfigEnum.ADMIN_STORAGE_UPLOAD_ALLOWED_MIME_TYPES
+                || config == SysConfigEnum.ADMIN_STORAGE_UPLOAD_PUBLIC_PREVIEW_ALLOWED_EXTENSIONS) {
+            if (StrUtil.isBlank(configValue)) {
+                throw new BaseException("上传文件类型白名单不能为空");
+            }
+            return;
+        }
+        if (config == SysConfigEnum.ADMIN_AUTH_LOGIN_IP_WHITELIST_VALUES) {
+            this.validateIpWhitelist(configValue);
+            return;
+        }
         if (LONG_POSITIVE_CONFIGS.contains(config)) {
-            if (this.parseLong(configValue) < 1) {
+            long value = this.parseLong(configValue);
+            if (value < 1) {
                 throw new BaseException("参数值必须大于0");
             }
             return;
@@ -139,6 +170,21 @@ public class SysConfigService {
     private void requireType(SysConfigValueTypeEnum actual, SysConfigValueTypeEnum expected) {
         if (actual != expected) {
             throw new BaseException("该参数的值类型必须为" + expected.getDesc());
+        }
+    }
+
+    /**
+     * 校验逗号分隔的登录 IP 白名单，支持单 IP 和 CIDR 网段。
+     */
+    private void validateIpWhitelist(String configValue) {
+        if (StrUtil.isBlank(configValue)) {
+            return;
+        }
+        boolean valid = Arrays.stream(configValue.split(","))
+                .map(String::trim)
+                .allMatch(ClientIpUtils::isValidIpOrCidr);
+        if (!valid) {
+            throw new BaseException("登录IP白名单仅支持单个IP或CIDR网段");
         }
     }
 

@@ -17,18 +17,21 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Jwt Token认证过滤器 for Spring Security
+ * Spring Security 的 JWT Token 认证过滤器
  */
 @Slf4j
 public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private AuthenticationManager authenticationManager;
     private Map<String, PublicAccess> publicAccessUrls;
+    private boolean supportQueryToken;
 
     public JwtTokenAuthenticationFilter(AuthenticationManager authenticationManager,
-                                        Map<String, PublicAccess> publicAccessUrls) {
+                                        Map<String, PublicAccess> publicAccessUrls,
+                                        boolean supportQueryToken) {
         this.authenticationManager = authenticationManager;
         this.publicAccessUrls = publicAccessUrls;
+        this.supportQueryToken = supportQueryToken;
     }
 
     @Override
@@ -37,17 +40,17 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
         logger.debug("doFilterInternal()");
 
-        // If required, authenticate and set web context
+        // 按需认证并写入当前 Web 上下文
         authenticateIfRequired(request);
 
         filterChain.doFilter(request, response);
 
-        // Clear web context
+        // 请求结束后清理线程上下文
         WebContextUtils.clear();
     }
 
     /**
-     * Authenticate if required
+     * 根据接口公开策略和 Token 状态按需完成认证
      */
     private void authenticateIfRequired(HttpServletRequest request) {
         String token = this.extractToken(request);
@@ -59,36 +62,36 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // wrap request authentication
+        // 封装认证请求
         Authentication authRequest = new JwtTokenAuthenticationToken(token);
-        // authenticate for result (delegate by ProviderManager)
+        // 委派 ProviderManager 执行认证
         Authentication authResult = authenticationManager.authenticate(authRequest);
-        // set to security context
+        // 写入 Spring Security 上下文
         SecurityContextHolder.getContext().setAuthentication(authResult);
     }
 
     /**
-     * Extract Authorization token from request
+     * 优先从 Authorization 请求头提取 Token；兼容模式下才读取查询参数
      */
     private String extractToken(HttpServletRequest request) {
         String authHeader = request.getHeader(CommonConsts.TOKEN_HEADER_KEY);
         if (StringUtils.isBlank(authHeader)) {
-            // 再尝试从query参数中获取
-            return this.getTokenFromParameter(request);
+            // 仅在显式启用兼容模式时尝试从query参数中获取
+            return supportQueryToken ? this.getTokenFromParameter(request) : null;
         } else {
             return authHeader.replace("Bearer ", "");
         }
     }
 
     /**
-     * 是否跳过认证
+     * 判断当前接口是否允许跳过认证
      */
     private boolean shouldSkipAuth(String url) {
         return this.isPublicAccessUrl(url) && !this.isAuthOnDemand(url);
     }
 
     /**
-     * isPublicAccessUrl
+     * 判断 URL 是否标记为匿名访问
      */
     private boolean isPublicAccessUrl(String url) {
         boolean r = publicAccessUrls.containsKey(url);
@@ -97,7 +100,7 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * isAuthOnDemand
+     * 判断匿名接口是否允许携带 Token 进行按需认证
      */
     private boolean isAuthOnDemand(String url) {
         PublicAccess access = publicAccessUrls.get(url);
@@ -107,8 +110,7 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * getTokenFromParameter
-     * 先后尝试获取access_token, accessToken, token
+     * 从兼容查询参数中按顺序读取 {@code access_token}、{@code accessToken}、{@code token}
      */
     private String getTokenFromParameter(HttpServletRequest request) {
         String token = request.getParameter("access_token");

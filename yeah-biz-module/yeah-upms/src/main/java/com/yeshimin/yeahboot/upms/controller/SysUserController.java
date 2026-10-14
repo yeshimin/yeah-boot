@@ -16,6 +16,7 @@ import com.yeshimin.yeahboot.data.domain.entity.SysRoleEntity;
 import com.yeshimin.yeahboot.data.domain.entity.SysUserEntity;
 import com.yeshimin.yeahboot.data.mapper.SysUserMapper;
 import com.yeshimin.yeahboot.data.repository.SysUserRepo;
+import com.yeshimin.yeahboot.flowcontrol.idempotent.Idempotent;
 import com.yeshimin.yeahboot.upms.domain.dto.*;
 import com.yeshimin.yeahboot.upms.domain.vo.MineVo;
 import com.yeshimin.yeahboot.upms.domain.vo.SysUserImportResultVo;
@@ -66,6 +67,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 创建
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':create')")
+    @Idempotent
     @SysLog(value = "创建用户", category = SysLogCategoryEnum.DATA)
     @PostMapping("/create")
     public R<SysUserEntity> create(@Valid @RequestBody SysUserCreateDto dto) {

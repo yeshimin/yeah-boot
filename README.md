@@ -45,6 +45,7 @@ yeah-boot
 │   └── yeah-upms              用户/角色/权限/组织模块
 └── yeah-framework             基础框架层
     ├── yeah-auth              认证与鉴权
+    ├── yeah-encryption        API 报文加解密与防重放
     ├── yeah-common-core       通用核心能力
     ├── yeah-common-data       通用数据层
     ├── yeah-flowcontrol       流控与限流
@@ -80,6 +81,9 @@ yeah-boot
 - WebSocket 消息推送与广播
 - Redis 消息发布与消费
 - 注解式限流控制
+- 登录失败限制、IP 白名单、审计来源 IP 与敏感日志脱敏
+- 可选 API 报文加密、防重放与注解式幂等提交
+- 文件上传类型、大小与公开预览策略的动态配置
 
 ## 快速开始
 
@@ -94,12 +98,12 @@ yeah-boot
 
 项目根目录的 `sql/` 下提供了初始化脚本压缩包，建议按以下顺序导入：
 
-- `sql/00.yeah_boot_main.sql.zip`：主库初始化脚本，包含核心表结构与基础数据
+- `sql/00.main.sql.zip`：主库初始化脚本，包含核心表结构、基础数据与当前安全基线参数
 - `sql/01.street_and_village_data.sql.zip`：街道与村庄数据，因数据量较大，按需导入
 
 建议顺序：
 
-1. 先导入 `00.yeah_boot_main`
+1. 先导入 `00.main`
 2. 如业务需要更完整的地区数据，再导入 `01.street_and_village_data`
 
 ### 管理后台默认账号
@@ -236,15 +240,15 @@ yeah-boot.storage.impl.qiniu.secret-key=your-qiniu-secret-key
 
 | 参数键 | 类型 | 默认值 | 说明 |
 |---|---|---:|---|
-| `auth.login.notice.enabled` | BOOLEAN | `false` | 是否显示登录页公告 |
-| `auth.login.notice.title` | STRING | 空 | 公告标题 |
-| `auth.login.notice.content` | STRING | 空 | 公告正文，按纯文本显示并保留换行 |
-| `auth.login.register.enabled` | BOOLEAN | `false` | 是否开放管理后台自注册 |
-| `auth.login.register.default-role-code` | STRING | 空 | 自注册用户自动绑定的默认角色编码 |
+| `admin.auth.login.notice.enabled` | BOOLEAN | `false` | 是否显示登录页公告 |
+| `admin.auth.login.notice.title` | STRING | 空 | 公告标题 |
+| `admin.auth.login.notice.content` | STRING | 空 | 公告正文，按纯文本显示并保留换行 |
+| `admin.auth.login.register.enabled` | BOOLEAN | `false` | 是否开放管理后台自注册 |
+| `admin.auth.login.register.default-role-code` | STRING | 空 | 自注册用户自动绑定的默认角色编码 |
 
-登录页公开参数需同时满足“启用”和“公开访问”两个条件。公开接口为 `GET /admin/sysConfig/publicConfig`，支持按 `groupCode` 查询多个参数，或按 `configKey` 精确查询一个参数，响应统一为 `NameValueVo` 列表。`auth.login.register.default-role-code` 不应开启公开访问。
+登录页公开参数需同时满足“启用”和“公开访问”两个条件。公开接口为 `GET /admin/sysConfig/publicConfig`，支持按 `groupCode` 查询多个参数，或按 `configKey` 精确查询一个参数，响应统一为 `NameValueVo` 列表。`admin.auth.login.register.default-role-code` 不应开启公开访问。
 
-开启自注册前，必须先创建并启用受限角色，再将其角色编码填写到 `auth.login.register.default-role-code`。注册接口只接收用户名、密码和验证码，组织、岗位、角色、状态等字段由服务端控制。
+开启自注册前，必须先创建并启用受限角色，再将其角色编码填写到 `admin.auth.login.register.default-role-code`。注册接口只接收用户名、密码和验证码，组织、岗位、角色、状态等字段由服务端控制。
 
 ## 开发建议
 

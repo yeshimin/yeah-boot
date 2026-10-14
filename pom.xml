@@ -44,6 +44,7 @@
         <disruptor.version>3.4.4</disruptor.version>
         <easyexcel.version>4.0.3</easyexcel.version>
         <commons-io.version>2.16.1</commons-io.version>
+        <bouncycastle.version>1.84</bouncycastle.version>
     </properties>
 
     <dependencyManagement>
@@ -67,6 +68,13 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- Bouncy Castle: SM2/SM3/SM4 implementation for payload encryption. -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <!-- Alibaba EasyExcel -->
@@ -100,6 +108,12 @@
             <dependency>
                 <groupId>com.yeshimin.yeahboot</groupId>
                 <artifactId>yeah-auth</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <!-- encryption module -->
+            <dependency>
+                <groupId>com.yeshimin.yeahboot</groupId>
+                <artifactId>yeah-encryption</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <!-- basic module -->

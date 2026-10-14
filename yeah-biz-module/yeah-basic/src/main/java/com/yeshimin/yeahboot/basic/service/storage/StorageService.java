@@ -33,12 +33,19 @@ public class StorageService extends BaseService {
     private final SysStorageRepo sysStorageRepo;
     private final StorageManager storageManager;
 
+    /** 执行底层存储对象上传安全策略的服务。 */
+    private final UploadPolicyService uploadPolicyService;
+
     /**
      * 上传文件
      */
     @Transactional(rollbackFor = Exception.class)
     public FileUploadVo upload(MultipartFile file, StorageTypeEnum storageType, String path,
                                Boolean isPublic, Boolean isUsed) {
+        // 检验文件
+        uploadPolicyService.validate(file);
+        uploadPolicyService.validatePublicPreview(file, Boolean.TRUE.equals(isPublic));
+
         // 存储文件
         SysStorageEntity result = storageManager.put(null, path, file, storageType, isPublic, isUsed);
         if (!result.getSuccess()) {

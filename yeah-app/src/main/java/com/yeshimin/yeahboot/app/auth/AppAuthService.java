@@ -98,8 +98,8 @@ public class AppAuthService {
      */
     public void sendSmsCode(SendSmsCodeDto dto) {
         // 生成短信验证码
-        Integer smsCodeLength = dynamicConfigService.getInteger(SysConfigEnum.SMS_CODE_LENGTH);
-        Integer smsCodeExpSeconds = dynamicConfigService.getInteger(SysConfigEnum.SMS_CODE_EXP_SECONDS);
+        Integer smsCodeLength = dynamicConfigService.getInteger(SysConfigEnum.GLOBAL_SMS_CODE_LENGTH);
+        Integer smsCodeExpSeconds = dynamicConfigService.getInteger(SysConfigEnum.GLOBAL_SMS_CODE_EXP_SECONDS);
         String smsCode = RandomUtil.randomNumbers(smsCodeLength);
         // 生成缓存key
         String key = String.format(CommonConsts.APP_SMS_CODE_KEY, dto.getMobile());

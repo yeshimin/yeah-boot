@@ -33,5 +33,10 @@ public enum SensitiveType {
     /**
      * 证件号码
      */
-    CERT
+    CERT,
+
+    /**
+     * 访问令牌
+     */
+    TOKEN
 }

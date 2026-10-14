@@ -1,3 +1,9 @@
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 spring:
   # mysql
   datasource:
@@ -19,6 +25,8 @@ spring:
 # auth相关
 auth:
   token:
+    # 是否支持识别query中的token
+    support-query-token: true
     # 全局jwt配置（subject中可覆盖）
     jwt:
       # 签发密钥

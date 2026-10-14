@@ -17,6 +17,7 @@
         <module>yeah-auth</module>
         <module>yeah-common-core</module>
         <module>yeah-common-data</module>
+        <module>yeah-encryption</module>
         <module>yeah-flowcontrol</module>
         <module>yeah-generator</module>
         <module>yeah-mq</module>

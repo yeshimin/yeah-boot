@@ -50,3 +50,23 @@ yeah-boot:
     # 实现：redis | rabbitmq
 #    impl: redis
     auto-ack: true
+  # api加解密相关【app端暂未支持】
+  encryption:
+    # OFF、OPTIONAL、REQUIRED；未配置环境变量时保持关闭
+    mode: ${YEAH_BOOT_API_ENCRYPTION_MODE:OFF}
+    # 当前内置的国密加密套件。
+    suite: ${YEAH_BOOT_API_ENCRYPTION_SUITE:sm2-sm4-gcm-v1}
+    # 当前 API 加密协议版本，仅支持 1。
+    version: ${YEAH_BOOT_API_ENCRYPTION_VERSION:1}
+    # 当前服务端密钥标识；更换密钥时应同步更新。
+    key-id: ${YEAH_BOOT_API_ENCRYPTION_KEY_ID:default}
+    # 始终保持明文的接口规则，格式为“路径 [HTTP方法]”；空列表表示不额外豁免。
+    bypass-routes: []
+    # 请求时间戳允许偏差，单位：秒。
+    timestamp-window-seconds: ${YEAH_BOOT_API_ENCRYPTION_TIMESTAMP_WINDOW_SECONDS:300}
+    # 防重放 nonce 缓存有效期，单位：秒；不能小于 timestamp-window-seconds。
+    replay-ttl-seconds: ${YEAH_BOOT_API_ENCRYPTION_REPLAY_TTL_SECONDS:300}
+    # 单个加密请求密文最大字节数。
+    max-payload-bytes: ${YEAH_BOOT_API_ENCRYPTION_MAX_PAYLOAD_BYTES:65536}
+    # 仅允许通过环境变量注入，不能写入版本控制的配置文件
+    private-key: ${YEAH_BOOT_API_ENCRYPTION_PRIVATE_KEY:}

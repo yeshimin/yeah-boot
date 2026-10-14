@@ -24,6 +24,12 @@
             <artifactId>java-jwt</artifactId>
         </dependency>
 
+        <!-- encryption module -->
+        <dependency>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-encryption</artifactId>
+        </dependency>
+
         <!-- Easy Captcha -->
         <dependency>
             <groupId>com.github.whvcse</groupId>

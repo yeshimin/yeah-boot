@@ -37,6 +37,9 @@ public class FileService extends BaseService {
 
     private final StorageProperties storageProperties;
 
+    /** 执行业务文件上传安全策略的服务。 */
+    private final UploadPolicyService uploadPolicyService;
+
     private String bucket;
     private String path;
 
@@ -51,6 +54,9 @@ public class FileService extends BaseService {
      */
     @Transactional(rollbackFor = Exception.class)
     public FileUploadVo upload(MultipartFile file, StorageTypeEnum storageType) {
+        // 校验文件
+        uploadPolicyService.validate(file);
+
         StorageTypeEnum finalStorageType = storageManager.getStorageType(storageType);
         // 决定bucket，除了local存储方式需要使用this.bucket，其他方式都指定为null
         String bucket = finalStorageType == StorageTypeEnum.LOCAL ? this.bucket : null;

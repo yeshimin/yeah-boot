@@ -11,6 +11,7 @@ import com.yeshimin.yeahboot.common.controller.base.BaseController;
 import com.yeshimin.yeahboot.common.domain.base.R;
 import com.yeshimin.yeahboot.data.service.DynamicConfigService;
 import com.yeshimin.yeahboot.flowcontrol.enums.GroupType;
+import com.yeshimin.yeahboot.flowcontrol.idempotent.Idempotent;
 import com.yeshimin.yeahboot.flowcontrol.ratelimit.RateLimit;
 import com.yeshimin.yeahboot.upms.domain.dto.LoginDto;
 import com.yeshimin.yeahboot.upms.domain.vo.LoginVo;
@@ -67,6 +68,7 @@ public class AdminAuthController extends BaseController {
     @PublicAccess
     @RateLimit(groupType = GroupType.IP, limitGroupCount = 5, timeWindow = 60 * 60 * 1000,
             description = "同一IP一小时最多注册5次")
+    @Idempotent
     @SysLog(value = "管理后台自注册", category = SysLogCategoryEnum.AUTH)
     @PostMapping("/register")
     public R<Void> register(@Valid @RequestBody AdminRegisterDto dto) {
@@ -100,6 +102,6 @@ public class AdminAuthController extends BaseController {
     }
 
     private Boolean isCaptchaEnabled() {
-        return dynamicConfigService.getBoolean(SysConfigEnum.CAPTCHA_ENABLED);
+        return dynamicConfigService.getBoolean(SysConfigEnum.ADMIN_AUTH_LOGIN_CAPTCHA_ENABLED);
     }
 }

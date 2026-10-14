@@ -25,6 +25,11 @@ public class SysLogEntity extends ConditionBaseEntity<SysLogEntity> {
     private Integer category;
 
     /**
+     * 客户端来源 IP
+     */
+    private String clientIp;
+
+    /**
      * 事件
      */
     private String event;
