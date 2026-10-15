@@ -98,13 +98,38 @@ yeah-boot
 
 项目根目录的 `sql/` 下提供了初始化脚本压缩包，建议按以下顺序导入：
 
-- `sql/00.main.sql.zip`：主库初始化脚本，包含核心表结构、基础数据与当前安全基线参数
-- `sql/01.street_and_village_data.sql.zip`：街道与村庄数据，因数据量较大，按需导入
+1. `sql/01.structure.sql.zip`：核心表结构与索引。
+2. `sql/02.data_without_area.sql.zip`：基础初始化数据，不含地区数据。
+3. `sql/03.data_area_level_1_to_3.sql.zip`：省、市、区县地区数据。
+4. `sql/04.data_area_level_4_to_5.sql.zip`：街道与村庄数据，数据量较大，按需导入。
 
-建议顺序：
+如只需要基础地区信息，导入前 3 个包即可；需要完整地区树时再导入第 4 个包。
 
-1. 先导入 `00.main`
-2. 如业务需要更完整的地区数据，再导入 `01.street_and_village_data`
+### MySQL 5.7 兼容导入
+
+初始化脚本以 MySQL 8 为基线。若目标数据库为 MySQL 5.7.6+，可使用 `script/mysql8_to_mysql57.py` 转换常见的 MySQL 8 排序规则和函数唯一索引；函数索引会转换为存储生成列加普通索引，以保留软删除场景下的唯一性约束。
+
+始终保留原始 Dump，并导入转换后的新文件。数据与结构分开导出时，数据文件必须通过 `--schema` 指向对应的原始结构文件，以便脚本为受影响的 `INSERT` 补充物理列名并排除生成列。
+
+```bash
+# 仅结构 SQL
+python3 script/mysql8_to_mysql57.py \
+  --input yeahboot_structure.sql \
+  --output output/structure.mysql57.sql
+
+# 仅数据 SQL：必须指定原始结构 SQL
+python3 script/mysql8_to_mysql57.py \
+  --input yeahboot_data.sql \
+  --schema yeahboot_structure.sql \
+  --output output/data.mysql57.sql
+
+# 结构和数据在同一个 SQL 文件时，不需要 --schema
+python3 script/mysql8_to_mysql57.py \
+  --input yeahboot_full.sql \
+  --output output/yeahboot_full.mysql57.sql
+```
+
+结构与数据分开时，先导入转换后的结构文件，再导入转换后的数据文件。该转换用于初始化空库；已有业务数据的环境应使用对应版本的增量迁移方案。
 
 ### 管理后台默认账号
 
