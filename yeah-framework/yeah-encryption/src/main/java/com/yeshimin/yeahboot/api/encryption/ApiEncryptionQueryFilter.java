@@ -1,6 +1,7 @@
 package com.yeshimin.yeahboot.api.encryption;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yeshimin.yeahboot.common.domain.base.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -47,20 +48,37 @@ public class ApiEncryptionQueryFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        // 拒绝混合明文参数与多个 Envelope，避免参数语义被覆盖或产生歧义。
-        if (!ApiEncryptionAttributes.MARKER_VALUE_V1.equals(
-                request.getHeader(ApiEncryptionAttributes.MARKER_HEADER))
-                || request.getParameterMap().size() != 1
-                || encryptedQueryValues.length != 1
-                || !StringUtils.hasText(encryptedQueryValues[0])) {
-            throw new ApiEncryptionException("加密查询参数格式无效");
+        byte[] plaintext;
+        try {
+            // 拒绝混合明文参数与多个 Envelope，避免参数语义被覆盖或产生歧义。
+            if (!ApiEncryptionAttributes.MARKER_VALUE_V1.equals(
+                    request.getHeader(ApiEncryptionAttributes.MARKER_HEADER))
+                    || request.getParameterMap().size() != 1
+                    || encryptedQueryValues.length != 1
+                    || !StringUtils.hasText(encryptedQueryValues[0])) {
+                throw new ApiEncryptionException("加密查询参数格式无效");
+            }
+
+            // 解密后用 RequestWrapper 替换参数映射，使既有 @RequestParam 绑定无需改造。
+            ApiEncryptionEnvelope envelope = this.readEnvelope(encryptedQueryValues[0]);
+            plaintext = apiEncryptionService.decryptRequest(envelope, request);
+        } catch (ApiEncryptionException e) {
+            // 过滤器异常不会经过 MVC 全局异常处理，直接返回统一业务失败结构，避免被错误分派为认证失败。
+            this.writeProtocolError(response, e);
+            return;
         }
 
-        // 解密后用 RequestWrapper 替换参数映射，使既有 @RequestParam 绑定无需改造。
-        ApiEncryptionEnvelope envelope = this.readEnvelope(encryptedQueryValues[0]);
-        byte[] plaintext = apiEncryptionService.decryptRequest(envelope, request);
         request.setAttribute(ApiEncryptionAttributes.ENCRYPTED_ATTRIBUTE, Boolean.TRUE);
         filterChain.doFilter(new DecryptedQueryRequestWrapper(request, plaintext, objectMapper), response);
+    }
+
+    /**
+     * 将过滤器阶段的协议错误写为统一业务响应。
+     */
+    private void writeProtocolError(HttpServletResponse response, ApiEncryptionException exception) throws IOException {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json;charset=UTF-8");
+        objectMapper.writeValue(response.getOutputStream(), R.fail(exception.getMessage()));
     }
 
     /**
