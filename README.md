@@ -98,10 +98,10 @@ yeah-boot
 
 项目根目录的 `sql/` 下提供了初始化脚本压缩包，建议按以下顺序导入：
 
-1. `sql/01.structure.sql.zip`：核心表结构与索引。
-2. `sql/02.data_without_area.sql.zip`：基础初始化数据，不含地区数据。
-3. `sql/03.data_area_level_1_to_3.sql.zip`：省、市、区县地区数据。
-4. `sql/04.data_area_level_4_to_5.sql.zip`：街道与村庄数据，数据量较大，按需导入。
+1. `sql/00.structure.sql.zip`：核心表结构与索引。
+2. `sql/01.data_without_area.sql.zip`：基础初始化数据，不含地区数据。
+3. `sql/02.data_area_level_1_to_3.sql.zip`：省、市、区县地区数据。
+4. `sql/03.data_area_level_4_to_5.sql.zip`：街道与村庄数据，数据量较大，按需导入。
 
 如只需要基础地区信息，导入前 3 个包即可；需要完整地区树时再导入第 4 个包。
 
