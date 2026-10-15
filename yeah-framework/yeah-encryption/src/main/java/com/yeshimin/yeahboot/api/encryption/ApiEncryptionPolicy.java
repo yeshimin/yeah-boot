@@ -11,6 +11,9 @@ public enum ApiEncryptionPolicy {
     /** 当前接口必须使用加密 Envelope。 */
     REQUIRED,
 
+    /** 当前接口在迁移期间同时接受明文和加密 Envelope。 */
+    OPTIONAL,
+
     /** 当前接口显式保持明文。 */
     BYPASS
 }

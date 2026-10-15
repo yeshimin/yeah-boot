@@ -22,6 +22,11 @@
             <groupId>com.yeshimin.yeahboot</groupId>
             <artifactId>yeah-auth</artifactId>
         </dependency>
+        <!-- API encryption module -->
+        <dependency>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-encryption</artifactId>
+        </dependency>
         <!-- flow control module -->
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>

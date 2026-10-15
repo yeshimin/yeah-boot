@@ -2,6 +2,8 @@ package com.yeshimin.yeahboot.basic.controller;
 
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryption;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryptionPolicy;
 import com.yeshimin.yeahboot.data.domain.entity.SysFileEntity;
 import com.yeshimin.yeahboot.basic.domain.dto.FileDeleteDto;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
@@ -42,6 +44,7 @@ public class FileController extends CrudController<SysFileMapper, SysFileEntity,
      * 上传文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':upload')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @SysLog(value = "上传文件", category = SysLogCategoryEnum.FILE)
     @PostMapping("/upload")
     public R<FileUploadVo> upload(@RequestParam("file") MultipartFile file,
@@ -62,6 +65,7 @@ public class FileController extends CrudController<SysFileMapper, SysFileEntity,
      * 下载文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':download')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @SysLog(value = "下载文件", category = SysLogCategoryEnum.FILE)
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> download(@RequestParam("fileKey") String fileKey) {

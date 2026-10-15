@@ -3,6 +3,8 @@ package com.yeshimin.yeahboot.upms.controller;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryption;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryptionPolicy;
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
 import com.yeshimin.yeahboot.common.common.log.SysLog;
 import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
@@ -130,6 +132,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 下载用户导入模板
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':importTemplate')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @GetMapping("/importTemplate")
     public ResponseEntity<byte[]> importTemplate() {
         return this.buildExcelResponse(sysUserExcelService.createImportTemplate(), "用户导入模板.xlsx");
@@ -139,6 +142,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 导入用户
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':import')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<SysUserImportResultVo> importUsers(@RequestParam("file") MultipartFile file) {
         return R.ok(sysUserExcelService.importUsers(file));
@@ -148,6 +152,7 @@ public class SysUserController extends CrudController<SysUserMapper, SysUserEnti
      * 导出用户
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':export')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportUsers(SysUserQueryDto dto) {
         String fileName = "用户数据_" + DateUtil.format(new Date(), "yyyyMMddHHmmss") + ".xlsx";

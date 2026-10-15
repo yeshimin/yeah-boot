@@ -3,6 +3,8 @@ package com.yeshimin.yeahboot.basic.controller;
 import com.yeshimin.yeahboot.basic.domain.vo.FileUploadVo;
 import com.yeshimin.yeahboot.basic.domain.dto.StorageDeleteDto;
 import com.yeshimin.yeahboot.basic.service.storage.StorageService;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryption;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryptionPolicy;
 import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
 import com.yeshimin.yeahboot.common.common.enums.StorageTypeEnum;
 import com.yeshimin.yeahboot.common.common.enums.SysLogCategoryEnum;
@@ -43,6 +45,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      * 上传文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':upload')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @SysLog(value = "上传存储文件", category = SysLogCategoryEnum.FILE)
     @PostMapping("/upload")
     public R<FileUploadVo> upload(@RequestParam("file") MultipartFile file,
@@ -70,6 +73,7 @@ public class StorageController extends CrudController<SysStorageMapper, SysStora
      * 下载文件
      */
     @PreAuthorize("@pms.hasPermission(this.getModule() + ':download')")
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @SysLog(value = "下载存储文件", category = SysLogCategoryEnum.FILE)
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> download(@RequestParam("fileKey") String fileKey) {

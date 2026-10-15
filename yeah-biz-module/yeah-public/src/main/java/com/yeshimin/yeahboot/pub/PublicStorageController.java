@@ -1,5 +1,7 @@
 package com.yeshimin.yeahboot.pub;
 
+import com.yeshimin.yeahboot.api.encryption.ApiEncryption;
+import com.yeshimin.yeahboot.api.encryption.ApiEncryptionPolicy;
 import com.yeshimin.yeahboot.auth.common.config.security.PublicAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -23,6 +25,7 @@ public class PublicStorageController {
      * 公开下载
      */
     @PublicAccess
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> publicDownload(@RequestParam("fileKey") String fileKey) {
         return storageService.download(fileKey, true);
@@ -32,6 +35,7 @@ public class PublicStorageController {
      * 公开下载-预览（一般是图片）
      */
     @PublicAccess
+    @ApiEncryption(ApiEncryptionPolicy.BYPASS)
     @GetMapping("/preview")
     public ResponseEntity<InputStreamResource> preview(@RequestParam("fileKey") String fileKey) {
         return storageService.preview(fileKey, true);

@@ -24,6 +24,12 @@
             <artifactId>yeah-common-data</artifactId>
         </dependency>
 
+        <!-- API encryption module -->
+        <dependency>
+            <groupId>com.yeshimin.yeahboot</groupId>
+            <artifactId>yeah-encryption</artifactId>
+        </dependency>
+
         <!-- common storage module -->
         <dependency>
             <groupId>com.yeshimin.yeahboot</groupId>
