@@ -1,7 +1,6 @@
 package com.yeshimin.yeahboot.auth.service;
 
 import cn.hutool.core.util.StrUtil;
-import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
@@ -51,20 +50,10 @@ public class CaptchaService {
     }
 
     /**
-     * 获取算术验证码
-     */
-    @SneakyThrows
-    private Captcha getArithmeticCaptcha() {
-        ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 48);
-        captcha.setFont(this.randomFont());
-        return captcha;
-    }
-
-    /**
-     * 随机验证码
+     * 随机生成不依赖 JDK 脚本引擎的图形验证码。
      */
     public Captcha getRandomCaptcha() {
-        int random = this.random(1, 3);
+        int random = this.random(1, 2);
         log.debug("随机验证码类型: {}", random);
 
         switch (random) {
@@ -72,8 +61,6 @@ public class CaptchaService {
                 return this.getPngCaptcha();
             case 2:
                 return this.getGifCaptcha();
-            case 3:
-                return this.getArithmeticCaptcha();
         }
         return this.getPngCaptcha();
     }
