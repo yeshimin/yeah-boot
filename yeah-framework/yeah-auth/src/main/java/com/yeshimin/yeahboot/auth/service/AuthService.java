@@ -52,7 +52,15 @@ public class AuthService {
         AuthVo authVo = new AuthVo();
 
         // 认证
-        JwtPayloadVo decodedResult = tokenService.decodeToken(dto.getToken());
+        JwtPayloadVo decodedResult;
+        try {
+            decodedResult = tokenService.decodeToken(dto.getToken());
+        } catch (Exception e) {
+            // 伪造或格式不完整的 Token 与验证失败具有相同的对外语义，不能泄露解析细节。
+            log.warn("Token 解析失败");
+            authVo.setAuthenticated(false);
+            return authVo;
+        }
         if (decodedResult == null) {
             log.error("token decode fail");
             authVo.setAuthenticated(false);

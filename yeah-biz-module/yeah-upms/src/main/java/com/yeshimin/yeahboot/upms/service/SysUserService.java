@@ -358,7 +358,7 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity entity = sysUserRepo.findOneById(userId);
         if (entity == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
 
         // 查询用户角色ID集合
@@ -379,12 +379,12 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity sysUser = sysUserRepo.findOneById(userId);
         if (sysUser == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
         if (CollUtil.isNotEmpty(roleIds)) {
             List<SysRoleEntity> listRole = sysRoleRepo.listByIds(roleIds);
             if (listRole.size() != roleIds.size()) {
-                throw new RuntimeException("角色ID不合法");
+                throw new BaseException("角色ID不合法");
             }
         }
 
@@ -447,7 +447,7 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity entity = sysUserRepo.findOneById(userId);
         if (entity == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
 
         // 密码，需要校验原密码
@@ -515,7 +515,7 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity entity = sysUserRepo.findOneById(userId);
         if (entity == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
 
         // 查询用户岗位ID集合
@@ -536,12 +536,12 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity sysUser = sysUserRepo.findOneById(userId);
         if (sysUser == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
         if (CollUtil.isNotEmpty(orgIds)) {
             List<SysOrgEntity> listOrg = sysOrgRepo.listByIds(orgIds);
             if (listOrg.size() != orgIds.size()) {
-                throw new RuntimeException("组织ID不合法");
+                throw new BaseException("组织ID不合法");
             }
         }
 
@@ -693,7 +693,7 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity entity = sysUserRepo.findOneById(userId);
         if (entity == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
 
         // 查询用户岗位ID集合
@@ -714,12 +714,12 @@ public class SysUserService {
         // 检查：用户是否存在
         SysUserEntity sysUser = sysUserRepo.findOneById(userId);
         if (sysUser == null) {
-            throw new RuntimeException("用户未找到");
+            throw new BaseException("用户未找到");
         }
         if (CollUtil.isNotEmpty(postIds)) {
             List<SysPostEntity> listPost = sysPostRepo.listByIds(postIds);
             if (listPost.size() != postIds.size()) {
-                throw new RuntimeException("岗位ID不合法");
+                throw new BaseException("岗位ID不合法");
             }
         }
 

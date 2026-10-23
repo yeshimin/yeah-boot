@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -38,5 +40,23 @@ class GlobalExceptionHandlerTest {
 
         assertEquals("请求格式错误", response.getMessage());
         assertFalse(response.getMessage().contains("internal_field"));
+    }
+
+    @Test
+    void returnsUnauthorizedForMethodAuthenticationFailure() {
+        R<Void> response = exceptionHandler.handleAuthenticationException(
+                new AuthenticationCredentialsNotFoundException("authentication is required"));
+
+        assertEquals(401, response.getCode());
+        assertEquals("认证失败", response.getMessage());
+    }
+
+    @Test
+    void returnsForbiddenForMethodAuthorizationFailure() {
+        R<Void> response = exceptionHandler.handleAccessDeniedException(
+                new AccessDeniedException("permission denied"));
+
+        assertEquals(403, response.getCode());
+        assertEquals("权限不足", response.getMessage());
     }
 }

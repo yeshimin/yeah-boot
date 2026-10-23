@@ -3,11 +3,10 @@ package com.yeshimin.yeahboot.auth.common.config.security;
 import com.yeshimin.yeahboot.auth.domain.dto.AuthDto;
 import com.yeshimin.yeahboot.auth.domain.vo.AuthVo;
 import com.yeshimin.yeahboot.auth.service.AuthService;
-import com.yeshimin.yeahboot.common.common.enums.ErrorCodeEnum;
-import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,8 +38,8 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider {
         authDto.setToken(token);
         AuthVo authVo = authService.auth(authDto);
         if (authVo == null || !authVo.getAuthenticated()) {
-            log.error("调用auth服务鉴权失败！");
-            throw new BaseException(ErrorCodeEnum.FAIL, "调用auth服务鉴权失败！");
+            log.warn("Token 认证失败");
+            throw new BadCredentialsException("认证失败");
         }
 
         // set web context

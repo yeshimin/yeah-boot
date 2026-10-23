@@ -6,6 +6,7 @@ import com.yeshimin.yeahboot.common.common.utils.WebContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,13 +41,18 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
         logger.debug("doFilterInternal()");
 
-        // 按需认证并写入当前 Web 上下文
-        authenticateIfRequired(request);
-
-        filterChain.doFilter(request, response);
-
-        // 请求结束后清理线程上下文
-        WebContextUtils.clear();
+        try {
+            // 按需认证并写入当前 Web 上下文
+            authenticateIfRequired(request);
+            filterChain.doFilter(request, response);
+        } catch (AuthenticationException e) {
+            // 此过滤器位于 ExceptionTranslationFilter 之前，认证异常需要在此返回统一响应。
+            SecurityContextHolder.clearContext();
+            new CustomAuthenticationEntryPoint().commence(request, response, e);
+        } finally {
+            // 无论认证、下游过滤器还是控制器是否异常，均清理线程上下文。
+            WebContextUtils.clear();
+        }
     }
 
     /**

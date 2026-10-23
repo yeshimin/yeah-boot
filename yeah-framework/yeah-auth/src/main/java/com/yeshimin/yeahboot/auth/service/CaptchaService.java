@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
+import com.yeshimin.yeahboot.common.common.exception.BaseException;
 import com.yeshimin.yeahboot.auth.domain.vo.CaptchaVo;
 import com.yeshimin.yeahboot.common.common.consts.CommonConsts;
 import lombok.RequiredArgsConstructor;
@@ -86,19 +87,19 @@ public class CaptchaService {
      */
     public void checkCaptcha(String key, String verCode) {
         if (StrUtil.isBlank(key) || StrUtil.isBlank(verCode)) {
-            log.error("验证码key或验证码不能为空");
-            throw new RuntimeException("验证码key或验证码不能为空");
+            log.warn("验证码不能为空");
+            throw new BaseException("验证码不能为空");
         }
 
         String cacheKey = String.format(CommonConsts.CAPTCHA_KEY, key);
         String cacheVerCode = redisTemplate.opsForValue().get(cacheKey);
         if (StrUtil.isBlank(cacheVerCode)) {
-            log.error("验证码已失效");
-            throw new RuntimeException("验证码已失效");
+            log.warn("验证码已失效");
+            throw new BaseException("验证码已失效");
         }
         if (!Objects.equals(cacheVerCode, verCode)) {
-            log.error("验证码错误");
-            throw new RuntimeException("验证码错误");
+            log.warn("验证码错误");
+            throw new BaseException("验证码错误");
         }
 
         // 删除验证码
