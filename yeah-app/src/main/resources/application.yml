@@ -39,6 +39,9 @@ decorator:
       exclude-categories: "info,debug,result,resultset,commit,rollback"
 
 yeah-boot:
+  # 跨域默认关闭；业务项目按环境配置启用并指定来源白名单。详细配置见CorsProperties类
+  cors:
+    enabled: false
   # app模块单独启动/打包的时候启用@MapperScan
   app-mapper-scan-enabled: true
   # ID编号生成器

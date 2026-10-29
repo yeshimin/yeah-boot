@@ -50,6 +50,9 @@ mybatis-plus:
       select-strategy: not_empty
 
 yeah-boot:
+  # 跨域默认关闭；业务项目按环境配置启用并指定来源白名单。详细配置见CorsProperties类
+  cors:
+    enabled: false
   # 是否为安全模式（场景：跳过@PreAuthorize @pms.hasPermission权限校验，方便权限配置或其他场景；一般为false，不需要动）
   safe-mode: false
   # 超级管理员账号，该账号可以跳过权限校验
