@@ -260,6 +260,26 @@ yeah-boot.storage.impl.qiniu.secret-key=your-qiniu-secret-key
 - 仓库中的 JWT 相关 key/secret 仅用于测试或开发环境，正式部署前务必替换为你自己的安全配置
 - 除上述自定义配置外，仍需补充 `spring.datasource.*`、`spring.data.redis.*` 等标准 Spring Boot 配置
 
+### 跨域访问
+
+管理后台与 API 部署在同一来源时，推荐使用反向代理转发 `/api/**`，无需开启 CORS。仅当前端与 API 必须跨来源部署时，才在服务端启用 `yeah-boot.cors`：
+
+```yaml
+yeah-boot:
+  cors:
+    enabled: true
+    allowed-origin-patterns:
+      - https://admin.example.com
+    allowed-headers:
+      - Authorization
+      - Content-Type
+      - Idempotency-Key
+```
+
+- CORS 默认关闭；启用时 `allowed-origin-patterns` 必填，应填写可信的前端来源或受控子域通配规则
+- 默认允许 `GET`、`POST`、`PUT`、`PATCH`、`DELETE`、`OPTIONS` 方法，并暴露文件下载所需的 `Content-Disposition`、`Content-Length` 响应头
+- 管理后台通过 `Authorization: Bearer <token>` 认证，通常不需要开启 `allow-credentials`；只有依赖浏览器 Cookie 等凭证时才按需启用
+
 ### 登录页公告与自注册
 
 管理后台登录页公告和自注册能力通过系统参数动态控制。参数变更后会自动刷新缓存，前端登录页会通过公开参数接口获取当前状态，无需根据域名判断环境。
