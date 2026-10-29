@@ -7,12 +7,14 @@ import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,11 +38,7 @@ public class RedisMqListenerRegistrar {
         for (MqListener listener : listeners) {
             String stream = listener.getTopic();
 
-            // 创建消费组（如果不存在）
-            try {
-                redisTemplate.opsForStream().createGroup(stream, properties.getDefaultGroup());
-            } catch (Exception ignored) {
-            }
+            ensureConsumerGroup(stream);
 
             // 用适配器包装业务 listener
             RedisMqListener adapter = new RedisMqListener(listener, redisTemplate, properties);
@@ -53,6 +51,22 @@ public class RedisMqListenerRegistrar {
         }
 
         container.start();
+    }
+
+    /**
+     * 确保 topic 对应的 Stream 与消费组已创建。
+     */
+    private void ensureConsumerGroup(String stream) {
+        // 最后一个参数对应 Redis 的 MKSTREAM，不产生初始化业务消息。
+        try {
+            redisTemplate.execute((RedisCallback<String>) connection -> connection.xGroupCreate(
+                    stream.getBytes(StandardCharsets.UTF_8),
+                    properties.getDefaultGroup(),
+                    ReadOffset.latest(),
+                    true));
+        } catch (Exception ignored) {
+            // 消费组已存在时 Redis 会抛出 BUSYGROUP，保持原有组即可。
+        }
     }
 
     @PreDestroy
